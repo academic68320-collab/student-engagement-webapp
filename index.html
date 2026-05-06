@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Engagement System — Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center font-sarabun">
+
+  <div class="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md text-center">
+    <div class="mb-6">
+      <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <span class="text-white text-2xl">🎓</span>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">Student Engagement</h1>
+      <p class="text-gray-500 text-sm mt-1">Intelligence System</p>
+    </div>
+
+    <div id="g_id_onload"
+      data-client_id="892749184005-3k7j7ut3mg4u31ecens0qu4gpg2dirjs.apps.googleusercontent.com"
+      data-callback="handleCredentialResponse"
+      data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="signin_with"
+      data-shape="rectangular"
+      data-logo_alignment="left"
+      data-width="320">
+    </div>
+
+    <p class="text-xs text-gray-400 mt-6">เข้าสู่ระบบด้วย Google Account ของโรงเรียนเท่านั้น</p>
+  </div>
+
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

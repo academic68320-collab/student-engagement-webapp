@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard — Student Engagement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-50 font-sarabun">
+
+  <nav class="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-lg">🎓</span>
+      <span class="font-bold text-gray-800">Teacher Dashboard</span>
+      <span class="text-gray-300 hidden sm:inline">|</span>
+      <span id="teacherName" class="text-sm text-gray-500 hidden sm:inline"></span>
+    </div>
+    <button onclick="AUTH.logout()" class="text-sm text-red-500 hover:text-red-700">ออกจากระบบ</button>
+  </nav>
+
+  <div class="max-w-4xl mx-auto px-6 py-8">
+
+    <!-- Search + Filter -->
+    <div class="flex gap-3 mb-6">
+      <input id="searchInput" type="text" placeholder="ค้นหาชื่อนักเรียน..."
+        class="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+      <select id="riskFilter"
+        class="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+        <option value="">ทุกระดับ</option>
+        <option value="HIGH">🔴 เสี่ยงสูง</option>
+        <option value="MEDIUM">🟡 เสี่ยงปานกลาง</option>
+        <option value="LOW">🟢 ปกติ</option>
+      </select>
+    </div>
+
+    <!-- Student List -->
+    <div id="studentList" class="space-y-3">
+      <p class="text-center text-gray-400 py-8">กำลังโหลด...</p>
+    </div>
+
+  </div>
+
+  <!-- Intervention Modal -->
+  <div id="interventionModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+      <h3 class="font-bold text-gray-800 mb-4">📝 บันทึกการติดตาม</h3>
+      <input type="hidden" id="modalStudentId">
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium text-gray-600">วิธีการติดตาม</label>
+          <select id="interventionMethod"
+            class="w-full border rounded-lg px-3 py-2 mt-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+            <option value="call">📞 โทรศัพท์</option>
+            <option value="email">📧 อีเมล</option>
+            <option value="visit">🏠 เยี่ยมบ้าน</option>
+            <option value="meeting">💬 พูดคุยที่โรงเรียน</option>
+            <option value="other">อื่นๆ</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">บันทึกเพิ่มเติม</label>
+          <textarea id="interventionNote" rows="3"
+            class="w-full border rounded-lg px-3 py-2 mt-1 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder="รายละเอียดการติดตาม..."></textarea>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">ผลลัพธ์</label>
+          <select id="interventionOutcome"
+            class="w-full border rounded-lg px-3 py-2 mt-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+            <option value="in_progress">⏳ อยู่ระหว่างดำเนินการ</option>
+            <option value="resolved">✅ แก้ไขได้แล้ว</option>
+            <option value="no_response">❌ ไม่มีการตอบสนอง</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <button onclick="TEACHER.closeModal()"
+          class="flex-1 border border-gray-200 rounded-lg py-2 text-sm text-gray-600 hover:bg-gray-50">
+          ยกเลิก
+        </button>
+        <button onclick="TEACHER.saveIntervention()"
+          class="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700">
+          บันทึก ✅
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/teacher.js"></script>
+</body>
+</html>
