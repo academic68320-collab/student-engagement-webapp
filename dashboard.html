@@ -11,12 +11,13 @@
 </head>
 <body class="bg-gray-50 font-sarabun">
 
-  <nav class="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm px-6 py-4 flex items-center justify-between sticky top-0 z-40">
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
         <span class="text-white text-sm">🎓</span>
       </div>
-      <span class="font-bold text-gray-800">Student Engagement System</span>
+      <span class="font-bold text-gray-800 hidden sm:block">Student Engagement System</span>
     </div>
     <div class="flex items-center gap-4">
       <img id="userAvatar" class="w-8 h-8 rounded-full" src="" alt="">
@@ -25,100 +26,230 @@
     </div>
   </nav>
 
+  <!-- Breadcrumb -->
+  <div class="bg-white border-b border-gray-100 px-6 py-3">
+    <div class="max-w-7xl mx-auto flex items-center gap-2 text-sm">
+      <button id="breadcrumbOverview"
+        onclick="DASHBOARD.goTo('overview')"
+        class="text-blue-600 hover:underline font-medium">ภาพรวม</button>
+
+      <span id="breadcrumbCourseWrap" class="hidden items-center gap-2">
+        <span class="text-gray-400">›</span>
+        <button id="breadcrumbCourse"
+          onclick="DASHBOARD.goTo('course')"
+          class="text-blue-600 hover:underline font-medium"></button>
+      </span>
+
+      <span id="breadcrumbStudentWrap" class="hidden items-center gap-2">
+        <span class="text-gray-400">›</span>
+        <span id="breadcrumbStudent" class="text-gray-600"></span>
+      </span>
+    </div>
+  </div>
+
   <div class="max-w-7xl mx-auto px-6 py-8">
 
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800">ภาพรวมโรงเรียน</h1>
-        <p id="lastUpdated" class="text-sm text-gray-400 mt-1"></p>
+    <!-- ═══════════════════════════════════════════
+         VIEW 1: OVERVIEW
+    ═══════════════════════════════════════════ -->
+    <div id="viewOverview">
+
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">ภาพรวมโรงเรียน</h1>
+          <p id="lastUpdated" class="text-sm text-gray-400 mt-1"></p>
+        </div>
+        <button id="syncBtn" onclick="DASHBOARD.syncNow()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+          🔄 Sync ข้อมูล
+        </button>
       </div>
-      <button id="syncBtn" onclick="DASHBOARD.syncNow()"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-        🔄 Sync ข้อมูล
-      </button>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+          <p class="text-sm text-gray-500">นักเรียนทั้งหมด</p>
+          <p id="totalStudents" class="text-3xl font-bold text-gray-800 mt-1">—</p>
+        </div>
+        <div class="bg-red-50 rounded-xl p-5 shadow-sm border border-red-100">
+          <p class="text-sm text-red-500">🔴 เสี่ยงสูง</p>
+          <p id="highRisk" class="text-3xl font-bold text-red-600 mt-1">—</p>
+        </div>
+        <div class="bg-yellow-50 rounded-xl p-5 shadow-sm border border-yellow-100">
+          <p class="text-sm text-yellow-600">🟡 เสี่ยงปานกลาง</p>
+          <p id="mediumRisk" class="text-3xl font-bold text-yellow-600 mt-1">—</p>
+        </div>
+        <div class="bg-green-50 rounded-xl p-5 shadow-sm border border-green-100">
+          <p class="text-sm text-green-600">🟢 ปกติ</p>
+          <p id="lowRisk" class="text-3xl font-bold text-green-600 mt-1">—</p>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h2 class="font-semibold text-gray-700 mb-4">สัดส่วนตามระดับความเสี่ยง</h2>
+          <canvas id="riskPieChart" height="200"></canvas>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h2 class="font-semibold text-gray-700 mb-4">แนวโน้ม Engagement Score</h2>
+          <canvas id="trendLineChart" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Course List -->
+      <div class="bg-white rounded-xl shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="font-semibold text-gray-700">รายวิชาทั้งหมด — คลิกเพื่อดูรายละเอียด</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">วิชา</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">นักเรียน</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">Avg Score</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">🔴 เสี่ยงสูง</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">🟡 ปานกลาง</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">🟢 ปกติ</th>
+              </tr>
+            </thead>
+            <tbody id="courseTable">
+              <tr><td colspan="6" class="text-center py-8 text-gray-400">กำลังโหลด...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-        <p class="text-sm text-gray-500">นักเรียนทั้งหมด</p>
-        <p id="totalStudents" class="text-3xl font-bold text-gray-800 mt-1">—</p>
+    <!-- ═══════════════════════════════════════════
+         VIEW 2: COURSE DETAIL
+    ═══════════════════════════════════════════ -->
+    <div id="viewCourse" class="hidden">
+
+      <div class="mb-6">
+        <h1 id="courseTitle" class="text-2xl font-bold text-gray-800"></h1>
+        <p id="courseSubtitle" class="text-sm text-gray-400 mt-1"></p>
       </div>
-      <div class="bg-red-50 rounded-xl p-5 shadow-sm border border-red-100">
-        <p class="text-sm text-red-500">🔴 เสี่ยงสูง</p>
-        <p id="highRisk" class="text-3xl font-bold text-red-600 mt-1">—</p>
+
+      <!-- Course KPI -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+          <p class="text-sm text-gray-500">นักเรียนในวิชา</p>
+          <p id="courseTotal" class="text-3xl font-bold text-gray-800 mt-1">—</p>
+        </div>
+        <div class="bg-red-50 rounded-xl p-5 shadow-sm border border-red-100">
+          <p class="text-sm text-red-500">🔴 เสี่ยงสูง</p>
+          <p id="courseHigh" class="text-3xl font-bold text-red-600 mt-1">—</p>
+        </div>
+        <div class="bg-yellow-50 rounded-xl p-5 shadow-sm border border-yellow-100">
+          <p class="text-sm text-yellow-600">🟡 ปานกลาง</p>
+          <p id="courseMedium" class="text-3xl font-bold text-yellow-600 mt-1">—</p>
+        </div>
+        <div class="bg-green-50 rounded-xl p-5 shadow-sm border border-green-100">
+          <p class="text-sm text-green-600">🟢 ปกติ</p>
+          <p id="courseLow" class="text-3xl font-bold text-green-600 mt-1">—</p>
+        </div>
       </div>
-      <div class="bg-yellow-50 rounded-xl p-5 shadow-sm border border-yellow-100">
-        <p class="text-sm text-yellow-600">🟡 เสี่ยงปานกลาง</p>
-        <p id="mediumRisk" class="text-3xl font-bold text-yellow-600 mt-1">—</p>
+
+      <!-- Student List in Course -->
+      <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="font-semibold text-gray-700">รายชื่อนักเรียน — คลิกเพื่อดูรายละเอียด</h2>
+          <input id="courseSearchInput" type="text" placeholder="ค้นหาชื่อ..."
+            class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">ชื่อ</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">Score</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">ส่งงาน</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">Active Days</th>
+                <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">ระดับความเสี่ยง</th>
+              </tr>
+            </thead>
+            <tbody id="courseStudentTable">
+              <tr><td colspan="5" class="text-center py-8 text-gray-400">กำลังโหลด...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="bg-green-50 rounded-xl p-5 shadow-sm border border-green-100">
-        <p class="text-sm text-green-600">🟢 ปกติ</p>
-        <p id="lowRisk" class="text-3xl font-bold text-green-600 mt-1">—</p>
-      </div>
+
     </div>
 
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-      <div class="bg-white rounded-xl p-6 shadow-sm">
-        <h2 class="font-semibold text-gray-700 mb-4">สัดส่วนตามระดับความเสี่ยง</h2>
-        <canvas id="riskPieChart" height="200"></canvas>
-      </div>
-      <div class="bg-white rounded-xl p-6 shadow-sm">
-        <h2 class="font-semibold text-gray-700 mb-4">แนวโน้ม Engagement Score</h2>
-        <canvas id="trendLineChart" height="200"></canvas>
-      </div>
-    </div>
+    <!-- ═══════════════════════════════════════════
+         VIEW 3: STUDENT DETAIL
+    ═══════════════════════════════════════════ -->
+    <div id="viewStudent" class="hidden">
 
-    <!-- Classroom Ranking -->
-    <div class="bg-white rounded-xl shadow-sm mb-6">
-      <div class="px-6 py-4 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-700">Ranking ห้องเรียน</h2>
+      <!-- Student Header -->
+      <div class="bg-white rounded-xl p-6 shadow-sm mb-6 flex items-center gap-6">
+        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-600 shrink-0"
+          id="studentAvatar"></div>
+        <div class="flex-1">
+          <h1 id="studentName" class="text-2xl font-bold text-gray-800"></h1>
+          <p id="studentEmail" class="text-sm text-gray-400"></p>
+          <p id="studentClassroom" class="text-sm text-gray-500 mt-1"></p>
+        </div>
+        <div id="studentRiskBadge" class="shrink-0 text-lg"></div>
       </div>
-      <div class="p-6">
-        <canvas id="classroomBarChart" height="120"></canvas>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="text-left px-4 py-3 text-xs text-gray-500 font-medium">#</th>
-              <th class="text-left px-4 py-3 text-xs text-gray-500 font-medium">ห้อง</th>
-              <th class="text-left px-4 py-3 text-xs text-gray-500 font-medium">Avg Score</th>
-              <th class="text-left px-4 py-3 text-xs text-gray-500 font-medium">จำนวนนักเรียน</th>
-              <th class="text-left px-4 py-3 text-xs text-gray-500 font-medium">เสี่ยงสูง</th>
-            </tr>
-          </thead>
-          <tbody id="classroomTable">
-            <tr><td colspan="5" class="text-center py-6 text-gray-400">กำลังโหลด...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- High Risk Table -->
-    <div class="bg-white rounded-xl shadow-sm">
-      <div class="px-6 py-4 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-700">นักเรียนเสี่ยงสูง (ต้องติดตามด่วน)</h2>
+      <!-- Score Breakdown + Trend -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h2 class="font-semibold text-gray-700 mb-4">Engagement Score Breakdown</h2>
+          <div class="flex items-center justify-center mb-4">
+            <div class="relative w-32 h-32">
+              <canvas id="studentScoreGauge"></canvas>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span id="studentScoreText" class="text-3xl font-bold text-gray-800"></span>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">ส่งงาน (50%)</span>
+                <span id="studentSubRate" class="font-medium"></span>
+              </div>
+              <div class="score-bar"><div id="studentSubBar" class="score-bar-fill bg-blue-400"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">Activity (30%)</span>
+                <span id="studentActScore" class="font-medium"></span>
+              </div>
+              <div class="score-bar"><div id="studentActBar" class="score-bar-fill bg-purple-400"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">Active Days (20%)</span>
+                <span id="studentDays" class="font-medium"></span>
+              </div>
+              <div class="score-bar"><div id="studentDaysBar" class="score-bar-fill bg-green-400"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <h2 class="font-semibold text-gray-700 mb-4">แนวโน้ม Score รายสัปดาห์</h2>
+          <canvas id="studentTrendChart" height="200"></canvas>
+        </div>
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">ชื่อ</th>
-              <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">ห้อง</th>
-              <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">Score</th>
-              <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">ส่งงาน</th>
-              <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">Active Days</th>
-              <th class="text-left px-6 py-3 text-xs text-gray-500 font-medium">สถานะ</th>
-            </tr>
-          </thead>
-          <tbody id="highRiskTable">
-            <tr><td colspan="6" class="text-center py-8 text-gray-400">กำลังโหลด...</td></tr>
-          </tbody>
-        </table>
+
+      <!-- Intervention History -->
+      <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="font-semibold text-gray-700">ประวัติการติดตาม</h2>
+        </div>
+        <div id="interventionHistory">
+          <p class="text-center text-gray-400 py-8">ยังไม่มีประวัติการติดตาม</p>
+        </div>
       </div>
+
     </div>
 
   </div>

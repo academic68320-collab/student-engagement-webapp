@@ -52,6 +52,29 @@ const CHARTS = {
     });
   },
 
+  renderGauge(canvasId, score) {
+    this._destroy(canvasId);
+    const ctx   = document.getElementById(canvasId).getContext('2d');
+    const color = score >= 70 ? '#10B981' : score >= 40 ? '#F59E0B' : '#EF4444';
+    this._instances[canvasId] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data:            [score, 100 - score],
+          backgroundColor: [color, '#F3F4F6'],
+          borderWidth:     0,
+        }],
+      },
+      options: {
+        responsive:  false,
+        cutout:      '75%',
+        rotation:    -90,
+        circumference: 180,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      },
+    });
+  },
+
   renderBar(canvasId, rankingData) {
     this._destroy(canvasId);
     const ctx = document.getElementById(canvasId).getContext('2d');
