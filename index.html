@@ -20,19 +20,22 @@
       <p class="text-gray-500 text-sm mt-1">Intelligence System</p>
     </div>
 
-    <div id="g_id_onload"
-      data-client_id="892749184005-3k7j7ut3mg4u31ecens0qu4gpg2dirjs.apps.googleusercontent.com"
-      data-callback="handleCredentialResponse"
-      data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-      data-type="standard"
-      data-size="large"
-      data-theme="outline"
-      data-text="signin_with"
-      data-shape="rectangular"
-      data-logo_alignment="left"
-      data-width="320">
+    <div id="gSignInBtn"></div>
+
+    <!-- Dev bypass (localhost only) -->
+    <div id="devLogin" class="hidden mt-4 space-y-2">
+      <p class="text-xs text-orange-400 font-medium">🛠 Dev Mode — localhost only</p>
+      <input id="devEmail" type="email" placeholder="email@feu.ac.th"
+        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+      <select id="devRole" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+        <option value="admin">admin (Dashboard)</option>
+        <option value="teacher">teacher (Teacher View)</option>
+        <option value="executive">executive (Dashboard)</option>
+      </select>
+      <button onclick="devSignIn()"
+        class="w-full bg-orange-500 text-white rounded-lg py-2 text-sm font-medium hover:bg-orange-600">
+        เข้าระบบ (Dev)
+      </button>
     </div>
 
     <p class="text-xs text-gray-400 mt-6">เข้าสู่ระบบด้วย Google Account ของโรงเรียนเท่านั้น</p>
@@ -48,7 +51,34 @@
         s.onerror = rej;
         document.head.appendChild(s);
       }));
-    }, Promise.resolve());
+    }, Promise.resolve()).then(() => {
+      // Show dev bypass on localhost
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        document.getElementById('devLogin').classList.remove('hidden');
+      }
+
+      // Init Google Sign-In
+      if (typeof google !== 'undefined') {
+        google.accounts.id.initialize({
+          client_id: '892749184005-3k7j7ut3mg4u31ecens0qu4gpg2dirjs.apps.googleusercontent.com',
+          callback:  handleCredentialResponse,
+          auto_select: false,
+        });
+        google.accounts.id.renderButton(
+          document.getElementById('gSignInBtn'),
+          { theme: 'outline', size: 'large', text: 'signin_with', shape: 'rectangular', logo_alignment: 'left', width: 320 }
+        );
+      }
+    });
+
+    function devSignIn() {
+      const email = document.getElementById('devEmail').value.trim();
+      const role  = document.getElementById('devRole').value;
+      if (!email) { alert('กรุณากรอก Email'); return; }
+      AUTH.saveSession({ email, name: email.split('@')[0], picture: '', role, token: 'dev' });
+      const map = { admin: 'dashboard.html', executive: 'dashboard.html', teacher: 'teacher.html' };
+      window.location.href = map[role] || 'teacher.html';
+    }
   </script>
 </body>
 </html>
