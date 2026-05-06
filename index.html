@@ -57,18 +57,22 @@
         document.getElementById('devLogin').classList.remove('hidden');
       }
 
-      // Init Google Sign-In
-      if (typeof google !== 'undefined') {
+      // Init Google Sign-In — poll until google.accounts is ready
+      (function waitGSI() {
+        if (typeof google === 'undefined' || !google.accounts?.id) {
+          setTimeout(waitGSI, 100);
+          return;
+        }
         google.accounts.id.initialize({
           client_id: '892749184005-3k7j7ut3mg4u31ecens0qu4gpg2dirjs.apps.googleusercontent.com',
-          callback:  handleCredentialResponse,
+          callback:  window.handleCredentialResponse,
           auto_select: false,
         });
         google.accounts.id.renderButton(
           document.getElementById('gSignInBtn'),
           { theme: 'outline', size: 'large', text: 'signin_with', shape: 'rectangular', logo_alignment: 'left', width: 320 }
         );
-      }
+      })();
     });
 
     function devSignIn() {

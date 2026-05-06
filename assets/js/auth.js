@@ -26,7 +26,7 @@ const AUTH = {
   },
 };
 
-async function handleCredentialResponse(response) {
+window.handleCredentialResponse = async function handleCredentialResponse(response) {
   const userData = AUTH.decodeJWT(response.credential);
 
   const allowedDomains = ['feu.ac.th', 'feu.edu'];
