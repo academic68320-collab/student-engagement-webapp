@@ -254,10 +254,17 @@
 
   </div>
 
-  <script src="assets/js/utils.js?v=2"></script>
-  <script src="assets/js/auth.js?v=2"></script>
-  <script src="assets/js/api.v2.js"></script>
-  <script src="assets/js/charts.js?v=2"></script>
-  <script src="assets/js/dashboard.js?v=2"></script>
+  <script>
+    const _v = Date.now();
+    ['utils','auth','api.v2','charts','dashboard'].reduce((p, name) => {
+      return p.then(() => new Promise((res, rej) => {
+        const s  = document.createElement('script');
+        s.src    = `assets/js/${name}.js?v=${_v}`;
+        s.onload = res;
+        s.onerror = rej;
+        document.head.appendChild(s);
+      }));
+    }, Promise.resolve());
+  </script>
 </body>
 </html>

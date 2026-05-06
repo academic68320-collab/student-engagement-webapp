@@ -38,8 +38,17 @@
     <p class="text-xs text-gray-400 mt-6">เข้าสู่ระบบด้วย Google Account ของโรงเรียนเท่านั้น</p>
   </div>
 
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/api.v2.js"></script>
-  <script src="assets/js/auth.js"></script>
+  <script>
+    const _v = Date.now();
+    ['utils','api.v2','auth'].reduce((p, name) => {
+      return p.then(() => new Promise((res, rej) => {
+        const s  = document.createElement('script');
+        s.src    = `assets/js/${name}.js?v=${_v}`;
+        s.onload = res;
+        s.onerror = rej;
+        document.head.appendChild(s);
+      }));
+    }, Promise.resolve());
+  </script>
 </body>
 </html>
