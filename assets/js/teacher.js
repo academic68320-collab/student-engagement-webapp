@@ -105,4 +105,3 @@ const TEACHER = {
   },
 };
 
-document.addEventListener('DOMContentLoaded', () => TEACHER.init());

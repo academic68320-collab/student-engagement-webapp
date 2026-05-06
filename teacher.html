@@ -100,7 +100,7 @@
         s.onerror = rej;
         document.head.appendChild(s);
       }));
-    }, Promise.resolve());
+    }, Promise.resolve()).then(() => TEACHER.init());
   </script>
 </body>
 </html>

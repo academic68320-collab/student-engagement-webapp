@@ -264,7 +264,7 @@
         s.onerror = rej;
         document.head.appendChild(s);
       }));
-    }, Promise.resolve());
+    }, Promise.resolve()).then(() => DASHBOARD.init());
   </script>
 </body>
 </html>

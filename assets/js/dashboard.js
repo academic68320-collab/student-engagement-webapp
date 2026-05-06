@@ -252,4 +252,3 @@ const DASHBOARD = {
   },
 };
 
-document.addEventListener('DOMContentLoaded', () => DASHBOARD.init());
