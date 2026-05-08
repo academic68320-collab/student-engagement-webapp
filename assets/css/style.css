@@ -17,7 +17,7 @@ body { animation: fadeIn 0.3s ease; }
   100% { background-position: -200% 0; }
 }
 
-.score-bar { height: 6px; border-radius: 3px; background: #e5e7eb; overflow: hidden; }
+.score-bar { height: 6px; border-radius: 3px; background: rgba(51,65,85,0.5); overflow: hidden; }
 .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
 
 .toast {

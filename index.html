@@ -3,45 +3,355 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Engagement System — Login</title>
+  <title>Student Engagement Intelligence System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; }
+
+    .slide-enter { animation: slideIn .6s ease forwards; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .dot.active { background: white; transform: scale(1.3); }
+    .dot { transition: all .3s; }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 40%, #0369a1 70%, #0e7490 100%);
+    }
+
+    .card-glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .stat-pill {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* shimmer on hero number */
+    .shimmer {
+      background: linear-gradient(90deg, #fff 0%, #bfdbfe 50%, #fff 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 3s infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    /* floating particles */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      from { transform: translateY(0) rotate(0deg); opacity: .6; }
+      to   { transform: translateY(-120vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center font-sarabun">
+<body class="min-h-screen bg-gray-950 flex items-stretch">
 
-  <div class="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md text-center">
-    <div class="mb-6">
-      <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <span class="text-white text-2xl">🎓</span>
+  <!-- ═══════════════════════════
+       LEFT — Hero + Slides
+  ═══════════════════════════ -->
+  <div class="gradient-bg relative hidden lg:flex flex-col justify-between w-[58%] p-12 overflow-hidden">
+
+    <!-- Particles -->
+    <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+
+    <!-- Logo + Title -->
+    <div class="relative z-10">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-xl">🎓</div>
+        <span class="text-white/80 font-semibold tracking-wide text-sm uppercase">Far Eastern University</span>
       </div>
-      <h1 class="text-2xl font-bold text-gray-800">Student Engagement</h1>
-      <p class="text-gray-500 text-sm mt-1">Intelligence System</p>
+      <h1 class="text-5xl font-extrabold text-white leading-tight mt-6">
+        Student Engagement<br>
+        <span class="shimmer">Intelligence System</span>
+      </h1>
+      <p class="text-blue-200 mt-3 text-lg leading-relaxed max-w-md">
+        ระบบติดตามและวิเคราะห์พฤติกรรมการเรียนจาก Google Classroom
+        เพื่อป้องกันนักเรียนหลุดจากระบบการศึกษา
+      </p>
     </div>
 
-    <div id="gSignInBtn"></div>
-
-    <!-- Dev bypass (localhost only) -->
-    <div id="devLogin" class="hidden mt-4 space-y-2">
-      <p class="text-xs text-orange-400 font-medium">🛠 Dev Mode — localhost only</p>
-      <input id="devEmail" type="email" placeholder="email@feu.ac.th"
-        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
-      <select id="devRole" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
-        <option value="admin">admin (Dashboard)</option>
-        <option value="teacher">teacher (Teacher View)</option>
-        <option value="executive">executive (Dashboard)</option>
-      </select>
-      <button onclick="devSignIn()"
-        class="w-full bg-orange-500 text-white rounded-lg py-2 text-sm font-medium hover:bg-orange-600">
-        เข้าระบบ (Dev)
-      </button>
+    <!-- Stats Row -->
+    <div class="relative z-10 flex gap-4 my-8">
+      <div class="stat-pill rounded-2xl px-5 py-3 text-center">
+        <p class="text-3xl font-bold text-white">53</p>
+        <p class="text-blue-200 text-xs mt-1">นักเรียนในระบบ</p>
+      </div>
+      <div class="stat-pill rounded-2xl px-5 py-3 text-center">
+        <p class="text-3xl font-bold text-white">42</p>
+        <p class="text-blue-200 text-xs mt-1">วิชาที่ติดตาม</p>
+      </div>
+      <div class="stat-pill rounded-2xl px-5 py-3 text-center">
+        <p class="text-3xl font-bold text-red-300">13</p>
+        <p class="text-blue-200 text-xs mt-1">นักเรียนเสี่ยงสูง</p>
+      </div>
+      <div class="stat-pill rounded-2xl px-5 py-3 text-center">
+        <p class="text-3xl font-bold text-green-300">48h</p>
+        <p class="text-blue-200 text-xs mt-1">SLA การติดตาม</p>
+      </div>
     </div>
 
-    <p class="text-xs text-gray-400 mt-6">เข้าสู่ระบบด้วย Google Account ของโรงเรียนเท่านั้น</p>
+    <!-- Feature Slides -->
+    <div class="relative z-10 flex-1 flex flex-col justify-end">
+      <div id="slideContainer" class="relative min-h-[200px]">
+
+        <!-- Slide 1 -->
+        <div class="slide absolute inset-0 card-glass rounded-2xl p-6 slide-enter" data-index="0">
+          <div class="flex items-start gap-4">
+            <div class="text-4xl shrink-0">📊</div>
+            <div>
+              <h3 class="text-white font-bold text-lg">Engagement Score Real-time</h3>
+              <p class="text-blue-200 text-sm mt-1 leading-relaxed">
+                คำนวณ Engagement Score อัตโนมัติจาก Submission Rate (50%) + Activity Score (30%) + Active Days (20%)
+                อ้างอิงงานวิจัย Early Warning System ระดับนานาชาติ
+              </p>
+              <div class="flex gap-2 mt-3">
+                <span class="bg-blue-500/30 text-blue-200 text-xs px-3 py-1 rounded-full">Submission Rate</span>
+                <span class="bg-purple-500/30 text-purple-200 text-xs px-3 py-1 rounded-full">Activity Score</span>
+                <span class="bg-green-500/30 text-green-200 text-xs px-3 py-1 rounded-full">Active Days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide absolute inset-0 card-glass rounded-2xl p-6 opacity-0 pointer-events-none" data-index="1">
+          <div class="flex items-start gap-4">
+            <div class="text-4xl shrink-0">🚨</div>
+            <div>
+              <h3 class="text-white font-bold text-lg">Early Warning System</h3>
+              <p class="text-blue-200 text-sm mt-1 leading-relaxed">
+                ตรวจจับสัญญาณเสี่ยงล่วงหน้า 4–8 สัปดาห์ก่อนนักเรียนหลุดจากระบบ
+                แจ้งเตือนครูทันทีเมื่อ Score ต่ำกว่า 40 หรือขาด Activity เกิน 7 วัน
+              </p>
+              <div class="flex gap-2 mt-3">
+                <span class="bg-red-500/30 text-red-200 text-xs px-3 py-1 rounded-full">🔴 High Risk &lt;40</span>
+                <span class="bg-yellow-500/30 text-yellow-200 text-xs px-3 py-1 rounded-full">🟡 Medium 40–69</span>
+                <span class="bg-green-500/30 text-green-200 text-xs px-3 py-1 rounded-full">🟢 Low 70+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide absolute inset-0 card-glass rounded-2xl p-6 opacity-0 pointer-events-none" data-index="2">
+          <div class="flex items-start gap-4">
+            <div class="text-4xl shrink-0">🔍</div>
+            <div>
+              <h3 class="text-white font-bold text-lg">Drill-down Analytics</h3>
+              <p class="text-blue-200 text-sm mt-1 leading-relaxed">
+                วิเคราะห์เชิงลึกระดับโรงเรียน → วิชา → รายนักเรียน
+                ดู Engagement แต่ละวิชาของนักเรียน พร้อมแนวโน้มรายสัปดาห์
+              </p>
+              <div class="flex gap-2 mt-3">
+                <span class="bg-cyan-500/30 text-cyan-200 text-xs px-3 py-1 rounded-full">ภาพรวม</span>
+                <span class="bg-cyan-500/30 text-cyan-200 text-xs px-3 py-1 rounded-full">รายวิชา</span>
+                <span class="bg-cyan-500/30 text-cyan-200 text-xs px-3 py-1 rounded-full">รายนักเรียน</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="slide absolute inset-0 card-glass rounded-2xl p-6 opacity-0 pointer-events-none" data-index="3">
+          <div class="flex items-start gap-4">
+            <div class="text-4xl shrink-0">🤝</div>
+            <div>
+              <h3 class="text-white font-bold text-lg">Teacher Intervention Tools</h3>
+              <p class="text-blue-200 text-sm mt-1 leading-relaxed">
+                ครูบันทึก Intervention Log ได้ทันที — โทรศัพท์, อีเมล, เยี่ยมบ้าน, พูดคุย
+                ติดตามประวัติการช่วยเหลือนักเรียนแต่ละคนแบบ Timeline
+              </p>
+              <div class="flex gap-2 mt-3">
+                <span class="bg-orange-500/30 text-orange-200 text-xs px-3 py-1 rounded-full">📞 โทรศัพท์</span>
+                <span class="bg-orange-500/30 text-orange-200 text-xs px-3 py-1 rounded-full">📧 อีเมล</span>
+                <span class="bg-orange-500/30 text-orange-200 text-xs px-3 py-1 rounded-full">🏠 เยี่ยมบ้าน</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="slide absolute inset-0 card-glass rounded-2xl p-6 opacity-0 pointer-events-none" data-index="4">
+          <div class="flex items-start gap-4">
+            <div class="text-4xl shrink-0">☁️</div>
+            <div>
+              <h3 class="text-white font-bold text-lg">Zero-Cost Google Ecosystem</h3>
+              <p class="text-blue-200 text-sm mt-1 leading-relaxed">
+                ใช้ Google Workspace ที่โรงเรียนมีอยู่แล้ว ไม่มีค่าใช้จ่ายเพิ่ม
+                Sync ข้อมูลจาก Google Classroom อัตโนมัติทุกวัน ข้อมูลอยู่ใน Ecosystem ของโรงเรียน
+              </p>
+              <div class="flex gap-2 mt-3">
+                <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full">Google Classroom</span>
+                <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full">Apps Script</span>
+                <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full">Google Sheets</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Dots -->
+      <div class="flex gap-2 mt-4 justify-center">
+        <div class="dot active w-2 h-2 rounded-full bg-white/40 cursor-pointer" onclick="SLIDES.goTo(0)"></div>
+        <div class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer" onclick="SLIDES.goTo(1)"></div>
+        <div class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer" onclick="SLIDES.goTo(2)"></div>
+        <div class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer" onclick="SLIDES.goTo(3)"></div>
+        <div class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer" onclick="SLIDES.goTo(4)"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════
+       RIGHT — Login Card
+  ═══════════════════════════ -->
+  <div class="flex-1 flex flex-col items-center justify-center px-6 py-12 min-h-screen relative overflow-hidden gradient-bg">
+
+    <div class="w-full max-w-sm">
+
+      <div class="w-full max-w-sm relative z-10">
+
+        <div class="mb-8 hidden lg:block text-center">
+          <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">🎓</span>
+          </div>
+          <h2 class="text-2xl font-bold text-white">ยินดีต้อนรับ</h2>
+          <p class="text-blue-200 mt-1 text-sm">เข้าสู่ระบบเพื่อเริ่มต้นใช้งาน</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="card-glass rounded-2xl p-8">
+          <div class="text-center mb-6">
+            <p class="text-sm font-semibold text-white">🔐 เข้าสู่ระบบ</p>
+            <p class="text-xs text-blue-200 mt-1">Google Account สำหรับบุคลากรโรงเรียน</p>
+          </div>
+
+          <div id="gSignInBtn" class="flex justify-center"></div>
+
+          <p class="text-xs text-blue-300 text-center mt-4">@feu.ac.th หรือ @feu.edu เท่านั้น</p>
+
+          <!-- Dev bypass -->
+          <div id="devLogin" class="hidden mt-6 pt-6 space-y-3 border-t border-white/10">
+            <p class="text-xs font-semibold text-center text-blue-200">🛠 Dev Mode — localhost</p>
+            <input id="devEmail" type="email" placeholder="email@feu.ac.th"
+              class="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 text-white placeholder-blue-300"
+              style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2)">
+            <select id="devRole"
+              class="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 text-white"
+              style="background:rgba(30,58,138,0.8); border:1px solid rgba(255,255,255,0.2)">
+              <option value="admin">👑 Admin</option>
+              <option value="executive">📊 Executive</option>
+              <option value="teacher">🍎 Teacher</option>
+            </select>
+            <button onclick="devSignIn()"
+              class="w-full rounded-xl py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+              style="background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3)">
+              เข้าระบบ
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile features -->
+        <div class="lg:hidden mt-6 grid grid-cols-2 gap-2">
+          <div class="card-glass rounded-xl p-3 text-center">
+            <div class="text-xl mb-1">📊</div>
+            <p class="text-xs font-medium text-blue-200">Engagement Score</p>
+          </div>
+          <div class="card-glass rounded-xl p-3 text-center">
+            <div class="text-xl mb-1">🚨</div>
+            <p class="text-xs font-medium text-blue-200">Early Warning</p>
+          </div>
+          <div class="card-glass rounded-xl p-3 text-center">
+            <div class="text-xl mb-1">🔍</div>
+            <p class="text-xs font-medium text-blue-200">Drill-down</p>
+          </div>
+          <div class="card-glass rounded-xl p-3 text-center">
+            <div class="text-xl mb-1">🤝</div>
+            <p class="text-xs font-medium text-blue-200">Intervention</p>
+          </div>
+        </div>
+
+        <!-- Mobile title -->
+        <div class="lg:hidden text-center mt-6">
+          <h1 class="text-lg font-bold text-white">Student Engagement</h1>
+          <p class="text-blue-200 text-xs mt-1">Intelligence System</p>
+        </div>
+
+        <p class="text-center text-xs text-blue-300 mt-8">
+          © 2568 Student Engagement Intelligence System<br>
+          <span class="text-blue-400">Powered by Google Workspace</span>
+        </p>
+
+      </div>
+    </div>
   </div>
 
   <script>
+    // ── Particles ──────────────────────────────────────────
+    const pc = document.getElementById('particles');
+    if (pc) {
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        const size = Math.random() * 80 + 20;
+        p.className = 'particle';
+        p.style.cssText = `
+          width:${size}px; height:${size}px;
+          left:${Math.random()*100}%;
+          top:${Math.random()*100}%;
+          animation-duration:${Math.random()*20+15}s;
+          animation-delay:${Math.random()*10}s;
+        `;
+        pc.appendChild(p);
+      }
+    }
+
+    // ── Slide Show ─────────────────────────────────────────
+    const SLIDES = {
+      current: 0,
+      total: 5,
+      timer: null,
+      slides: document.querySelectorAll('.slide'),
+      dots:   document.querySelectorAll('.dot'),
+
+      goTo(n) {
+        this.slides[this.current].style.opacity   = '0';
+        this.slides[this.current].style.pointerEvents = 'none';
+        this.dots[this.current].classList.remove('active');
+
+        this.current = (n + this.total) % this.total;
+
+        this.slides[this.current].style.opacity   = '1';
+        this.slides[this.current].style.pointerEvents = 'auto';
+        this.slides[this.current].style.transition = 'opacity .6s ease';
+        this.dots[this.current].classList.add('active');
+      },
+
+      next() { this.goTo(this.current + 1); },
+
+      start() {
+        this.timer = setInterval(() => this.next(), 5000);
+      },
+    };
+    SLIDES.start();
+
+    // ── Scripts loader ─────────────────────────────────────
     const _v = Date.now();
     ['utils','api.v2','auth'].reduce((p, name) => {
       return p.then(() => new Promise((res, rej) => {
@@ -52,25 +362,22 @@
         document.head.appendChild(s);
       }));
     }, Promise.resolve()).then(() => {
-      // Show dev bypass on localhost
       if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
         document.getElementById('devLogin').classList.remove('hidden');
       }
-
-      // Init Google Sign-In — poll until google.accounts is ready
       (function waitGSI() {
         if (typeof google === 'undefined' || !google.accounts?.id) {
-          setTimeout(waitGSI, 100);
-          return;
+          setTimeout(waitGSI, 100); return;
         }
         google.accounts.id.initialize({
-          client_id: '892749184005-3k7j7ut3mg4u31ecens0qu4gpg2dirjs.apps.googleusercontent.com',
-          callback:  window.handleCredentialResponse,
+          client_id:   '892749184005-3k7j7ut3mg4u31ecens0qu4gpg2dirjs.apps.googleusercontent.com',
+          callback:    window.handleCredentialResponse,
           auto_select: false,
         });
         google.accounts.id.renderButton(
           document.getElementById('gSignInBtn'),
-          { theme: 'outline', size: 'large', text: 'signin_with', shape: 'rectangular', logo_alignment: 'left', width: 320 }
+          { theme: 'outline', size: 'large', text: 'signin_with',
+            shape: 'rectangular', logo_alignment: 'left', width: 280 }
         );
       })();
     });
@@ -80,8 +387,7 @@
       const role  = document.getElementById('devRole').value;
       if (!email) { alert('กรุณากรอก Email'); return; }
       AUTH.saveSession({ email, name: email.split('@')[0], picture: '', role, token: 'dev' });
-      const map = { admin: 'dashboard.html', executive: 'dashboard.html', teacher: 'teacher.html' };
-      window.location.href = map[role] || 'teacher.html';
+      window.location.href = { admin:'dashboard.html', executive:'dashboard.html', teacher:'teacher.html' }[role] || 'teacher.html';
     }
   </script>
 </body>
