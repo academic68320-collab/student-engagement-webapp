@@ -9,6 +9,10 @@ const TEACHER = {
     if (!this._user) return;
     UTILS.showLoader('กำลังโหลดรายวิชา...');
     document.getElementById('teacherName').textContent = UTILS.escapeHtml(this._user.name);
+
+    history.replaceState({ view: 'courses' }, '', location.href);
+    window.addEventListener('popstate', e => TEACHER._onPopState(e));
+
     await this.loadCourses();
     UTILS.hideLoader();
   },
@@ -28,12 +32,25 @@ const TEACHER = {
     }
   },
 
+  _onPopState(e) {
+    const { view, data } = e.state || { view: 'courses', data: {} };
+    if (view === 'students' && data?.courseId) {
+      this.openCourse(data, true);
+    } else {
+      this.goTo('courses');
+    }
+  },
+
   // ─── VIEW 1: Course List ─────────────────────────────────────────────────
   async loadCourses() {
     const res = await API.get('getTeacherCourses', { teacherEmail: this._user.email });
     const container = document.getElementById('courseCards');
 
-    if (!res || !res.data.length) {
+    if (!res) {
+      UTILS.apiError(container, () => TEACHER.loadCourses());
+      return;
+    }
+    if (!res.data.length) {
       container.innerHTML = `<p class="text-center text-slate-500 py-8">ไม่พบวิชาที่รับผิดชอบ</p>`;
       return;
     }
@@ -73,8 +90,9 @@ const TEACHER = {
   },
 
   // ─── VIEW 2: Student List ────────────────────────────────────────────────
-  async openCourse(course) {
+  async openCourse(course, fromHistory = false) {
     this._currentCourse = course;
+    if (!fromHistory) history.pushState({ view: 'students', data: course }, '', location.href);
     this.goTo('students');
 
     document.getElementById('bcCourseName').textContent   = course.courseName;
@@ -92,7 +110,10 @@ const TEACHER = {
     UTILS.showLoader('กำลังโหลดรายชื่อนักเรียน...');
     const res = await API.get('getCourseStudents', { courseId: course.courseId });
     UTILS.hideLoader();
-    if (!res) return;
+    if (!res) {
+      UTILS.apiError('studentList', () => TEACHER.openCourse(TEACHER._currentCourse));
+      return;
+    }
 
     this._allStudents = res.data;
     this.renderStudents(this._allStudents);

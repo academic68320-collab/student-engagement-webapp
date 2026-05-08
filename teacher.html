@@ -204,7 +204,7 @@
 
   <script>
     const _v = Date.now();
-    ['utils','auth','api.v2','charts','teacher'].reduce((p, name) => {
+    ['config','utils','auth','api.v2','charts','teacher'].reduce((p, name) => {
       return p.then(() => new Promise((res, rej) => {
         const s  = document.createElement('script');
         s.src    = `assets/js/${name}.js?v=${_v}`;

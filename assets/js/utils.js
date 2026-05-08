@@ -37,6 +37,24 @@ const UTILS = {
     setTimeout(() => { this._loaderEl?.remove(); this._loaderEl = null; }, 400);
   },
 
+  apiError(containerId, retryFn) {
+    const el = typeof containerId === 'string'
+      ? document.getElementById(containerId)
+      : containerId;
+    if (!el) return;
+    el.innerHTML = `
+      <div style="text-align:center;padding:48px 24px">
+        <div style="font-size:36px;margin-bottom:12px">⚠️</div>
+        <p style="color:#f87171;font-weight:600;font-size:15px;margin:0 0 6px">เชื่อมต่อ API ไม่สำเร็จ</p>
+        <p style="color:#475569;font-size:12px;margin:0 0 20px">ตรวจสอบการเชื่อมต่อหรือ Apps Script URL</p>
+        ${retryFn ? `<button onclick="(${retryFn.toString()})()"
+          style="background:#1d4ed8;color:#fff;border:none;padding:8px 20px;
+          border-radius:8px;font-size:13px;cursor:pointer;font-family:Sarabun,sans-serif">
+          🔄 ลองใหม่
+        </button>` : ''}
+      </div>`;
+  },
+
   setAvatar(imgEl, url, name) {
     if (!imgEl) return;
     const initial = (name || '?').trim().charAt(0).toUpperCase();

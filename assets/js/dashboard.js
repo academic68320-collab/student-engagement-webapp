@@ -72,7 +72,10 @@ const DASHBOARD = {
   // ─── VIEW 1: Overview ────────────────────────────────────────────────────
   async loadSummary() {
     const res = await API.get('getSummary');
-    if (!res) return;
+    if (!res) {
+      UTILS.apiError('kpiError', () => DASHBOARD.init());
+      return;
+    }
 
     const { total, high, medium, low, trend } = res.data;
     document.getElementById('totalStudents').textContent = total;
@@ -86,7 +89,10 @@ const DASHBOARD = {
 
   async loadCourseList() {
     const res = await API.get('getCourseList');
-    if (!res) return;
+    if (!res) {
+      UTILS.apiError('courseTable', () => DASHBOARD.loadCourseList());
+      return;
+    }
 
     this._allCourses = res.data;
 
