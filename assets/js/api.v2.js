@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbyA9OZ4ru14QXRGSrKsnBzQw_0X7VsjbxzA89Ux0E2IARGRwqID3f1mKMR6fXnH_ELv/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwr7vDFw2gZkYSBj0VKoDb4D_MBNTyyN2fYx8OPHnEOAW3TN27rPQw81MNA-MwsEvEo/exec';
 
 const API = {
 
