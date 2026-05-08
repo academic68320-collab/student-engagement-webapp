@@ -7,21 +7,22 @@ const UTILS = {
     const el = document.createElement('div');
     el.id = 'pageLoader';
     el.style.cssText = `
-      position:fixed; inset:0; z-index:9999; display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 40%,#0369a1 70%,#0e7490 100%);
-      transition:opacity .4s ease;
+      position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center;
+      background:rgba(8,15,30,0.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+      transition:opacity .3s ease;
     `;
     el.innerHTML = `
-      <div style="text-align:center">
-        <div style="width:72px;height:72px;background:rgba(255,255,255,0.15);border-radius:20px;
-          display:flex;align-items:center;justify-content:center;font-size:32px;
-          margin:0 auto 20px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">🎓</div>
-        <div style="width:48px;height:48px;border:3px solid rgba(255,255,255,0.2);
-          border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px"></div>
-        <p style="color:rgba(255,255,255,0.9);font-family:Sarabun,sans-serif;font-size:15px;font-weight:600"></p>
-        <p style="color:rgba(255,255,255,0.45);font-family:Sarabun,sans-serif;font-size:12px;margin-top:6px">
-          Student Engagement Intelligence System</p>
+      <div style="
+        background:rgba(15,23,42,0.92); border:1px solid rgba(51,65,85,0.6);
+        border-radius:20px; padding:36px 48px; text-align:center;
+        box-shadow:0 24px 64px rgba(0,0,0,0.5); min-width:220px;
+      ">
+        <div style="width:56px;height:56px;border:3px solid rgba(59,130,246,0.25);
+          border-top-color:#3b82f6;border-radius:50%;animation:spin .75s linear infinite;
+          margin:0 auto 20px"></div>
+        <p style="color:#e2e8f0;font-family:Sarabun,sans-serif;font-size:15px;font-weight:600;margin:0 0 6px"></p>
+        <p style="color:#475569;font-family:Sarabun,sans-serif;font-size:11px;margin:0">
+          Student Engagement System</p>
       </div>
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     `;
