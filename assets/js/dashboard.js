@@ -24,6 +24,9 @@ const DASHBOARD = {
       document.getElementById('adminBtns').classList.remove('hidden');
     }
 
+    history.replaceState({ view: 'overview' }, '', location.href);
+    window.addEventListener('popstate', e => DASHBOARD._onPopState(e));
+
     await Promise.all([
       this.loadSummary(),
       this.loadCourseList(),
@@ -262,8 +265,9 @@ const DASHBOARD = {
   },
 
   // ─── VIEW 2: Course Detail ────────────────────────────────────────────────
-  async openCourse(course) {
+  async openCourse(course, fromHistory = false) {
     this._currentCourse = course;
+    if (!fromHistory) history.pushState({ view: 'course', data: course }, '', location.href);
     this.goTo('course', course);
 
     document.getElementById('courseTitle').textContent    = course.courseName;
@@ -365,7 +369,8 @@ const DASHBOARD = {
   },
 
   // ─── VIEW 3: Student Detail ───────────────────────────────────────────────
-  async openStudent(studentId, fullName) {
+  async openStudent(studentId, fullName, fromHistory = false) {
+    if (!fromHistory) history.pushState({ view: 'student', data: { studentId, fullName } }, '', location.href);
     this.goTo('student', { fullName });
 
     document.getElementById('studentAvatar').textContent   = fullName?.charAt(0) || '?';
@@ -722,6 +727,18 @@ const DASHBOARD = {
     const win = window.open('', '_blank');
     win.document.write(html);
     win.document.close();
+  },
+
+  // ─── Browser Back/Forward ────────────────────────────────────────────────
+  _onPopState(e) {
+    const { view, data } = e.state || { view: 'overview', data: {} };
+    if (view === 'course' && data?.courseId) {
+      this.openCourse(data, true);
+    } else if (view === 'student' && data?.studentId) {
+      this.openStudent(data.studentId, data.fullName, true);
+    } else {
+      this.goTo('overview');
+    }
   },
 
   // ─── System Config ───────────────────────────────────────────────────────
