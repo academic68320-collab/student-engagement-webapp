@@ -387,7 +387,11 @@ const DASHBOARD = {
 
     UTILS.showLoader('กำลังโหลดข้อมูลนักเรียน...');
     const res = await API.get('getStudentDetail', { studentId });
-    if (!res) { UTILS.hideLoader(); return; }
+    UTILS.hideLoader();
+    if (!res) {
+      UTILS.apiError('studentError', () => DASHBOARD.openStudent(studentId, fullName, true));
+      return;
+    }
 
     const s = res.data;
 

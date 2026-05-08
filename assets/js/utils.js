@@ -94,10 +94,11 @@ const UTILS = {
   },
 
   riskBadge(level) {
+    const dot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle"></span>';
     const map = {
-      HIGH:   '<span class="px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs font-medium">🔴 เสี่ยงสูง</span>',
-      MEDIUM: '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">🟡 เสี่ยงปานกลาง</span>',
-      LOW:    '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">🟢 ปกติ</span>',
+      HIGH:   `<span style="display:inline-flex;align-items:center;padding:2px 10px;background:rgba(127,29,29,0.35);border:1px solid rgba(185,28,28,0.4);border-radius:999px;font-size:11px;font-weight:600;color:#f87171">${dot.replace('style="', 'style="background:#ef4444;')}เสี่ยงสูง</span>`,
+      MEDIUM: `<span style="display:inline-flex;align-items:center;padding:2px 10px;background:rgba(120,53,15,0.35);border:1px solid rgba(180,83,9,0.4);border-radius:999px;font-size:11px;font-weight:600;color:#fbbf24">${dot.replace('style="', 'style="background:#f59e0b;')}เสี่ยงปานกลาง</span>`,
+      LOW:    `<span style="display:inline-flex;align-items:center;padding:2px 10px;background:rgba(20,83,45,0.35);border:1px solid rgba(22,101,52,0.4);border-radius:999px;font-size:11px;font-weight:600;color:#34d399">${dot.replace('style="', 'style="background:#10b981;')}ปกติ</span>`,
     };
     return map[level] || '—';
   },
