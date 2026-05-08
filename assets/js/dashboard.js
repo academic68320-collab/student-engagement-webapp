@@ -724,6 +724,98 @@ const DASHBOARD = {
     win.document.close();
   },
 
+  // ─── System Config ───────────────────────────────────────────────────────
+  openConfig() {
+    const cfg = CONFIG.get();
+
+    // Risk thresholds
+    document.getElementById('cfg_highMax').value   = cfg.highMax;
+    document.getElementById('cfg_mediumMax').value = cfg.mediumMax;
+    document.getElementById('cfg_lowDisplay').textContent = cfg.mediumMax + '+';
+
+    // Weights
+    document.getElementById('cfg_wSubmission').value  = cfg.wSubmission;
+    document.getElementById('cfg_wActivity').value    = cfg.wActivity;
+    document.getElementById('cfg_wActiveDays').value  = cfg.wActiveDays;
+    this._onWeightChange();
+
+    // Recommendation thresholds
+    document.getElementById('cfg_subUrgent').value   = cfg.subUrgent;
+    document.getElementById('cfg_subWarning').value  = cfg.subWarning;
+    document.getElementById('cfg_daysUrgent').value  = cfg.daysUrgent;
+    document.getElementById('cfg_daysWarning').value = cfg.daysWarning;
+    document.getElementById('cfg_actWarning').value  = cfg.actWarning;
+    document.getElementById('cfg_trendDrop').value   = cfg.trendDrop;
+
+    document.getElementById('configModal').classList.remove('hidden');
+  },
+
+  closeConfig() {
+    document.getElementById('configModal').classList.add('hidden');
+  },
+
+  _onWeightChange() {
+    const w1 = Number(document.getElementById('cfg_wSubmission').value);
+    const w2 = Number(document.getElementById('cfg_wActivity').value);
+    const w3 = Number(document.getElementById('cfg_wActiveDays').value);
+    const sum = w1 + w2 + w3;
+
+    document.getElementById('cfg_wSubmission_val').textContent = w1 + '%';
+    document.getElementById('cfg_wActivity_val').textContent   = w2 + '%';
+    document.getElementById('cfg_wActiveDays_val').textContent = w3 + '%';
+
+    const sumEl = document.getElementById('cfg_weightSum');
+    sumEl.textContent = `รวม ${sum}%`;
+    sumEl.className = sum === 100
+      ? 'text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-950/50 text-emerald-400 border border-emerald-800/40'
+      : 'text-xs font-bold px-2 py-0.5 rounded-full bg-red-950/50 text-red-400 border border-red-800/40';
+
+    // Auto-update LOW display
+    const mediumMax = Number(document.getElementById('cfg_mediumMax').value);
+    if (!isNaN(mediumMax)) {
+      document.getElementById('cfg_lowDisplay').textContent = mediumMax + '+';
+    }
+  },
+
+  saveConfig() {
+    const highMax   = Number(document.getElementById('cfg_highMax').value);
+    const mediumMax = Number(document.getElementById('cfg_mediumMax').value);
+    const w1 = Number(document.getElementById('cfg_wSubmission').value);
+    const w2 = Number(document.getElementById('cfg_wActivity').value);
+    const w3 = Number(document.getElementById('cfg_wActiveDays').value);
+
+    if (highMax >= mediumMax) {
+      UTILS.toast('เกณฑ์เสี่ยงสูงต้องน้อยกว่าเกณฑ์เสี่ยงปานกลาง', 'error'); return;
+    }
+    if (w1 + w2 + w3 !== 100) {
+      UTILS.toast('น้ำหนักรวมต้องเท่ากับ 100%', 'error'); return;
+    }
+
+    CONFIG.save({
+      highMax,
+      mediumMax,
+      wSubmission: w1,
+      wActivity:   w2,
+      wActiveDays: w3,
+      subUrgent:   Number(document.getElementById('cfg_subUrgent').value),
+      subWarning:  Number(document.getElementById('cfg_subWarning').value),
+      daysUrgent:  Number(document.getElementById('cfg_daysUrgent').value),
+      daysWarning: Number(document.getElementById('cfg_daysWarning').value),
+      actWarning:  Number(document.getElementById('cfg_actWarning').value),
+      trendDrop:   Number(document.getElementById('cfg_trendDrop').value),
+    });
+
+    UTILS.toast('✅ บันทึกการตั้งค่าสำเร็จ', 'success');
+    this.closeConfig();
+  },
+
+  resetConfig() {
+    if (!confirm('รีเซ็ตกลับเป็นค่าเริ่มต้น?')) return;
+    CONFIG.reset();
+    UTILS.toast('รีเซ็ตค่าเริ่มต้นแล้ว', 'info');
+    this.openConfig();
+  },
+
   // ─── Sync ────────────────────────────────────────────────────────────────
   async syncNow() {
     const btn = document.getElementById('syncBtn');

@@ -88,6 +88,10 @@
           </div>
         </div>
         <div id="adminBtns" class="hidden flex-col sm:flex-row gap-2 flex">
+          <button onclick="DASHBOARD.openConfig()"
+            class="border border-slate-600 text-slate-300 px-4 py-2 rounded-lg text-sm hover:bg-slate-800 transition-colors">
+            ⚙️ ตั้งค่าระบบ
+          </button>
           <button id="alertBtn" onclick="DASHBOARD.sendAlerts()"
             class="bg-orange-500/90 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-500 transition-colors shadow shadow-orange-900/30">
             📧 ส่ง Alert Email
@@ -390,6 +394,187 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════
+       SYSTEM CONFIG MODAL
+  ═══════════════════════════════════════════ -->
+  <div id="configModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+    <div class="rounded-2xl shadow-2xl shadow-black/50 w-full max-w-2xl flex flex-col border border-slate-700/50"
+      style="background:#0f172a;max-height:90vh">
+
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between shrink-0">
+        <h3 class="font-bold text-white text-lg">⚙️ ตั้งค่าระบบ</h3>
+        <button onclick="DASHBOARD.closeConfig()" class="text-slate-500 hover:text-slate-300 text-xl leading-none transition-colors">✕</button>
+      </div>
+
+      <!-- Body -->
+      <div class="overflow-y-auto flex-1 px-6 py-5 space-y-7">
+
+        <!-- ── Section 1: Risk Thresholds ── -->
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">ระดับความเสี่ยง (Risk Thresholds)</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="card rounded-xl p-4">
+              <p class="text-xs text-red-400 font-semibold mb-2">🔴 เสี่ยงสูง (HIGH)</p>
+              <p class="text-xs text-slate-500 mb-2">Score น้อยกว่า</p>
+              <div class="flex items-center gap-2">
+                <input id="cfg_highMax" type="number" min="1" max="99"
+                  class="glow-input w-20 rounded-lg px-3 py-1.5 text-sm text-center font-bold">
+                <span class="text-slate-500 text-sm">คะแนน</span>
+              </div>
+            </div>
+            <div class="card rounded-xl p-4">
+              <p class="text-xs text-amber-400 font-semibold mb-2">🟡 เสี่ยงปานกลาง (MEDIUM)</p>
+              <p class="text-xs text-slate-500 mb-2">Score ตั้งแต่ HIGH ถึงน้อยกว่า</p>
+              <div class="flex items-center gap-2">
+                <input id="cfg_mediumMax" type="number" min="1" max="100"
+                  class="glow-input w-20 rounded-lg px-3 py-1.5 text-sm text-center font-bold">
+                <span class="text-slate-500 text-sm">คะแนน</span>
+              </div>
+            </div>
+            <div class="card rounded-xl p-4">
+              <p class="text-xs text-emerald-400 font-semibold mb-2">🟢 ปกติ (LOW)</p>
+              <p class="text-xs text-slate-500 mb-2">Score ตั้งแต่</p>
+              <p id="cfg_lowDisplay" class="text-2xl font-bold text-emerald-400 mt-1">—</p>
+              <p class="text-xs text-slate-600 mt-0.5">คำนวณอัตโนมัติ</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section 2: Weight Factors ── -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">น้ำหนักคะแนน (Weight Factors)</p>
+            <span id="cfg_weightSum" class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">รวม 100%</span>
+          </div>
+          <div class="card rounded-xl p-4 space-y-4">
+            <div class="grid grid-cols-[1fr_auto_auto] items-center gap-3">
+              <div>
+                <p class="text-sm text-slate-300 font-medium">อัตราส่งงาน (Submission Rate)</p>
+                <p class="text-xs text-slate-600">ส่วนน้ำหนักในสูตร engagementScore</p>
+              </div>
+              <input id="cfg_wSubmission" type="range" min="0" max="100"
+                oninput="DASHBOARD._onWeightChange()"
+                class="w-24 accent-blue-500">
+              <span id="cfg_wSubmission_val" class="text-sm font-bold text-blue-400 w-10 text-right">50%</span>
+            </div>
+            <div class="grid grid-cols-[1fr_auto_auto] items-center gap-3">
+              <div>
+                <p class="text-sm text-slate-300 font-medium">คะแนนกิจกรรม (Activity Score)</p>
+                <p class="text-xs text-slate-600">ส่วนน้ำหนักในสูตร engagementScore</p>
+              </div>
+              <input id="cfg_wActivity" type="range" min="0" max="100"
+                oninput="DASHBOARD._onWeightChange()"
+                class="w-24 accent-blue-500">
+              <span id="cfg_wActivity_val" class="text-sm font-bold text-blue-400 w-10 text-right">30%</span>
+            </div>
+            <div class="grid grid-cols-[1fr_auto_auto] items-center gap-3">
+              <div>
+                <p class="text-sm text-slate-300 font-medium">วันที่ active (Active Days)</p>
+                <p class="text-xs text-slate-600">ส่วนน้ำหนักในสูตร engagementScore</p>
+              </div>
+              <input id="cfg_wActiveDays" type="range" min="0" max="100"
+                oninput="DASHBOARD._onWeightChange()"
+                class="w-24 accent-blue-500">
+              <span id="cfg_wActiveDays_val" class="text-sm font-bold text-blue-400 w-10 text-right">20%</span>
+            </div>
+            <p class="text-xs text-slate-600 border-t border-slate-700/50 pt-3">
+              สูตร: <code class="text-slate-400">engagementScore = (submissionRate × W1%) + (activityScore × W2%) + (activeDays/30×100 × W3%)</code>
+            </p>
+          </div>
+        </div>
+
+        <!-- ── Section 3: Recommendation Thresholds ── -->
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">เกณฑ์การแจ้งเตือน (Recommendation Rules)</p>
+          <div class="card rounded-xl p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">ส่งงานวิกฤต → โทรหาผู้ปกครอง</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-600">ต่ำกว่า</span>
+                  <input id="cfg_subUrgent" type="number" min="0" max="100"
+                    class="glow-input w-16 rounded-lg px-2 py-1 text-sm text-center">
+                  <span class="text-xs text-slate-600">%</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">ส่งงานต่ำ → พูดคุย</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-600">ต่ำกว่า</span>
+                  <input id="cfg_subWarning" type="number" min="0" max="100"
+                    class="glow-input w-16 rounded-lg px-2 py-1 text-sm text-center">
+                  <span class="text-xs text-slate-600">%</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Active days วิกฤต → เยี่ยมบ้าน</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-600">ต่ำกว่า</span>
+                  <input id="cfg_daysUrgent" type="number" min="0" max="31"
+                    class="glow-input w-16 rounded-lg px-2 py-1 text-sm text-center">
+                  <span class="text-xs text-slate-600">วัน</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Active days ต่ำ → พูดคุย</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-600">ต่ำกว่า</span>
+                  <input id="cfg_daysWarning" type="number" min="0" max="31"
+                    class="glow-input w-16 rounded-lg px-2 py-1 text-sm text-center">
+                  <span class="text-xs text-slate-600">วัน</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Activity score ต่ำ → พูดคุย</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-600">ต่ำกว่า</span>
+                  <input id="cfg_actWarning" type="number" min="0" max="100"
+                    class="glow-input w-16 rounded-lg px-2 py-1 text-sm text-center">
+                  <span class="text-xs text-slate-600">%</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Score ลด 3 สัปดาห์ → Email</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-600">ลด ≥</span>
+                  <input id="cfg_trendDrop" type="number" min="1" max="100"
+                    class="glow-input w-16 rounded-lg px-2 py-1 text-sm text-center">
+                  <span class="text-xs text-slate-600">คะแนน</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Apps Script hint ── -->
+        <div class="rounded-xl border border-amber-800/30 bg-amber-950/20 px-4 py-3">
+          <p class="text-xs text-amber-400 font-semibold mb-1">⚠️ หมายเหตุ</p>
+          <p class="text-xs text-amber-200/60">การตั้งค่านี้มีผลกับ Frontend (การแสดงผลและ Recommendation Engine) เท่านั้น
+            หากต้องการให้ Apps Script คำนวณ riskLevel ตามค่าเดียวกัน
+            ต้องอัปเดตค่า <code>HIGH_MAX</code> และ <code>MEDIUM_MAX</code> ใน <code>DB.gs</code> ด้วยตนเอง</p>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-slate-700/50 flex gap-3 shrink-0">
+        <button onclick="DASHBOARD.resetConfig()"
+          class="border border-slate-700 rounded-lg px-4 py-2 text-sm text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-colors">
+          รีเซ็ตค่าเริ่มต้น
+        </button>
+        <button onclick="DASHBOARD.closeConfig()"
+          class="flex-1 border border-slate-600 rounded-lg py-2 text-sm text-slate-400 hover:bg-slate-800 transition-colors">
+          ยกเลิก
+        </button>
+        <button onclick="DASHBOARD.saveConfig()"
+          class="flex-1 gradient-bg text-white rounded-lg py-2 text-sm font-medium hover:opacity-90 transition-opacity">
+          บันทึกการตั้งค่า
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Alert Email Modal -->
   <div id="alertModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
     <div class="rounded-2xl shadow-2xl shadow-black/50 w-full max-w-2xl flex flex-col border border-slate-700/50"
@@ -425,7 +610,7 @@
 
   <script>
     const _v = Date.now();
-    ['utils','auth','api.v2','charts','dashboard'].reduce((p, name) => {
+    ['config','utils','auth','api.v2','charts','dashboard'].reduce((p, name) => {
       return p.then(() => new Promise((res, rej) => {
         const s  = document.createElement('script');
         s.src    = `assets/js/${name}.js?v=${_v}`;

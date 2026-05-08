@@ -73,6 +73,15 @@ const UTILS = {
   // Returns array of { level, icon, reason, method, note }
   // level: 'urgent' | 'warning' | 'good'
   recommend(student) {
+    const cfg     = (typeof CONFIG !== 'undefined') ? CONFIG.get() : {};
+    const subU    = cfg.subUrgent   ?? 30;
+    const subW    = cfg.subWarning  ?? 60;
+    const dayU    = cfg.daysUrgent  ?? 3;
+    const dayW    = cfg.daysWarning ?? 8;
+    const actW    = cfg.actWarning  ?? 20;
+    const trend   = cfg.trendDrop   ?? 10;
+    const lowMin  = cfg.mediumMax   ?? 70;
+
     const sub     = Number(student.submissionRate ?? 100);
     const act     = Number(student.activityScore  ?? 100);
     const days    = Number(student.activeDays     ?? 30);
@@ -81,34 +90,34 @@ const UTILS = {
     const results = [];
 
     // ── Rule 1: Submission rate ─────────────────────────────────────────────
-    if (sub < 30) {
+    if (sub < subU) {
       results.push({
         level: 'urgent', icon: '📵',
-        reason: `ส่งงานเพียง ${sub}% — ต่ำกว่าเกณฑ์วิกฤต`,
+        reason: `ส่งงานเพียง ${sub}% — ต่ำกว่าเกณฑ์วิกฤต (${subU}%)`,
         method: 'call',
         note: `นักเรียนส่งงานเพียง ${sub}% ควรติดต่อผู้ปกครองโดยด่วน เพื่อหาสาเหตุที่ไม่ส่งงาน`,
       });
-    } else if (sub < 60) {
+    } else if (sub < subW) {
       results.push({
         level: 'warning', icon: '📋',
-        reason: `ส่งงาน ${sub}% — ต่ำกว่าเกณฑ์`,
+        reason: `ส่งงาน ${sub}% — ต่ำกว่าเกณฑ์ (${subW}%)`,
         method: 'meeting',
         note: `นักเรียนส่งงาน ${sub}% ซึ่งต่ำกว่าเกณฑ์ แนะนำพูดคุยส่วนตัวเพื่อหาสาเหตุและให้กำลังใจ`,
       });
     }
 
     // ── Rule 2: Active days ─────────────────────────────────────────────────
-    if (days < 3) {
+    if (days < dayU) {
       results.push({
         level: 'urgent', icon: '🏫',
-        reason: `เข้าเรียนเพียง ${days} วัน — เกือบขาดเรียนทั้งหมด`,
+        reason: `เข้าเรียนเพียง ${days} วัน — เกือบขาดเรียนทั้งหมด (เกณฑ์ ${dayU} วัน)`,
         method: 'visit',
         note: `นักเรียนมี active days เพียง ${days} วัน แนะนำเยี่ยมบ้านหรือโทรหาผู้ปกครองทันที`,
       });
-    } else if (days < 8) {
+    } else if (days < dayW) {
       results.push({
         level: 'warning', icon: '📅',
-        reason: `Active days ${days} วัน — เข้าเรียนไม่สม่ำเสมอ`,
+        reason: `Active days ${days} วัน — เข้าเรียนไม่สม่ำเสมอ (เกณฑ์ ${dayW} วัน)`,
         method: 'meeting',
         note: `นักเรียนเข้าเรียนไม่สม่ำเสมอ (${days} วัน) แนะนำพูดคุยเพื่อสำรวจปัญหา`,
       });
@@ -116,13 +125,13 @@ const UTILS = {
 
     // ── Rule 3: Declining trend 3+ weeks ──────────────────────────────────
     if (history.length >= 3) {
-      const recent = history.slice(-3).map(h => Number(h.engagementScore || 0));
+      const recent   = history.slice(-3).map(h => Number(h.engagementScore || 0));
       const dropping = recent[0] > recent[1] && recent[1] > recent[2];
-      const drop = recent[0] - recent[2];
-      if (dropping && drop >= 10) {
+      const drop     = recent[0] - recent[2];
+      if (dropping && drop >= trend) {
         results.push({
           level: 'warning', icon: '📉',
-          reason: `Score ลดติดต่อกัน 3 สัปดาห์ (ลด ${drop} คะแนน)`,
+          reason: `Score ลดติดต่อกัน 3 สัปดาห์ (ลด ${drop} คะแนน, เกณฑ์ ${trend})`,
           method: 'email',
           note: `Engagement score ลดลงต่อเนื่อง 3 สัปดาห์ จาก ${recent[0]} → ${recent[2]} แนะนำส่ง Email แจ้งผู้ปกครอง`,
         });
@@ -130,10 +139,10 @@ const UTILS = {
     }
 
     // ── Rule 4: Low activity score ─────────────────────────────────────────
-    if (act < 20 && !results.some(r => r.method === 'meeting')) {
+    if (act < actW && !results.some(r => r.method === 'meeting')) {
       results.push({
         level: 'warning', icon: '💤',
-        reason: `Activity score ${act}% — แทบไม่ทำกิจกรรม`,
+        reason: `Activity score ${act}% — แทบไม่ทำกิจกรรม (เกณฑ์ ${actW}%)`,
         method: 'meeting',
         note: `นักเรียนมี activity score เพียง ${act}% แนะนำพูดคุยส่วนตัวเพื่อสร้างแรงจูงใจ`,
       });
@@ -143,7 +152,7 @@ const UTILS = {
     if (!results.length) {
       results.push({
         level: 'good', icon: '✅',
-        reason: score >= 70
+        reason: score >= lowMin
           ? `Engagement score ${score} — อยู่ในเกณฑ์ดี ไม่จำเป็นต้องติดตามพิเศษ`
           : `ยังไม่มีสัญญาณเตือนที่ชัดเจน — ติดตามต่อเนื่องตามปกติ`,
         method: null,
