@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คู่มือการใช้งาน — Student Engagement System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 40%, #0369a1 70%, #0e7490 100%); }
+    .card        { background: rgba(15,23,42,0.75); border: 1px solid rgba(51,65,85,0.55); }
+    .card-red    { background: rgba(127,29,29,0.25); border: 1px solid rgba(185,28,28,0.3); }
+    .card-yellow { background: rgba(120,53,15,0.25); border: 1px solid rgba(180,83,9,0.3); }
+    .card-green  { background: rgba(20,83,45,0.25);  border: 1px solid rgba(22,101,52,0.3); }
+    .tab-active  { background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.5); color: #93c5fd; }
+    .tab-inactive{ background: transparent; border-color: rgba(51,65,85,0.4); color: #64748b; }
+    .step-num    { background: linear-gradient(135deg,#1d4ed8,#0369a1); }
+    .badge-admin    { background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.4); color:#c4b5fd; }
+    .badge-exec     { background:rgba(6,78,59,0.25);  border:1px solid rgba(16,185,129,0.3); color:#6ee7b7; }
+    .badge-teacher  { background:rgba(30,58,138,0.3); border:1px solid rgba(59,130,246,0.35); color:#93c5fd; }
+
+    /* sticky sidebar on desktop */
+    @media (min-width: 1024px) {
+      .sidebar { position: sticky; top: 80px; }
+    }
+
+    .prose-dark h3 { color:#e2e8f0; font-size:1.05rem; font-weight:700; margin:1.5rem 0 .6rem; }
+    .prose-dark p  { color:#94a3b8; font-size:.9rem; line-height:1.75; margin:.4rem 0; }
+    .prose-dark ul { color:#94a3b8; font-size:.9rem; list-style:disc; padding-left:1.2rem; margin:.4rem 0; }
+    .prose-dark li { margin:.25rem 0; line-height:1.65; }
+    .prose-dark strong { color:#e2e8f0; }
+    .prose-dark code { background:rgba(51,65,85,0.5); color:#7dd3fc; padding:1px 6px; border-radius:4px; font-size:.82rem; }
+
+    .section-divider { border-color: rgba(51,65,85,0.4); }
+  </style>
+</head>
+<body class="bg-[#080f1e] min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="gradient-bg px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-lg shadow-black/30">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+        <span class="text-white text-sm">🎓</span>
+      </div>
+      <span class="font-bold text-white hidden sm:block tracking-wide">Student Engagement System</span>
+      <span class="text-white/30 hidden sm:inline">|</span>
+      <span class="text-sm text-blue-200 hidden sm:inline font-medium">คู่มือการใช้งาน</span>
+    </div>
+    <a href="index.html" class="text-sm text-blue-200 hover:text-white transition-colors">← กลับหน้าหลัก</a>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-4 py-10">
+
+    <!-- Hero -->
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-extrabold text-white mb-3">คู่มือการใช้งานระบบ</h1>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto">
+        Student Engagement Intelligence System — Far Eastern University<br>
+        เลือก Level ของท่านเพื่อดูคู่มือที่เหมาะสม
+      </p>
+    </div>
+
+    <!-- Role Tabs -->
+    <div class="flex gap-3 mb-8 flex-wrap justify-center">
+      <button onclick="switchTab('admin')" id="tab-admin"
+        class="tab-active flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-semibold transition-all">
+        <span class="w-5 h-5 rounded-md badge-admin flex items-center justify-center text-xs">A</span>
+        Admin
+      </button>
+      <button onclick="switchTab('exec')" id="tab-exec"
+        class="tab-inactive flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-semibold transition-all">
+        <span class="w-5 h-5 rounded-md badge-exec flex items-center justify-center text-xs">E</span>
+        Executive
+      </button>
+      <button onclick="switchTab('teacher')" id="tab-teacher"
+        class="tab-inactive flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-semibold transition-all">
+        <span class="w-5 h-5 rounded-md badge-teacher flex items-center justify-center text-xs">T</span>
+        Teacher
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         ADMIN TAB
+    ═══════════════════════════════════════════ -->
+    <div id="content-admin">
+      <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6 items-start">
+
+        <!-- Sidebar -->
+        <div class="sidebar card rounded-xl p-4 space-y-1 text-sm hidden lg:block">
+          <p class="text-xs text-slate-500 uppercase tracking-wider font-bold mb-3">เนื้อหา</p>
+          <a href="#a-login"   class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">1. เข้าสู่ระบบ</a>
+          <a href="#a-overview" class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">2. ภาพรวมโรงเรียน</a>
+          <a href="#a-course"  class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">3. รายละเอียดวิชา</a>
+          <a href="#a-student" class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">4. รายละเอียดนักเรียน</a>
+          <a href="#a-alert"   class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">5. ส่ง Alert Email</a>
+          <a href="#a-sync"    class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">6. Sync ข้อมูล</a>
+          <a href="#a-config"  class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">7. ตั้งค่าระบบ</a>
+          <a href="#a-export"  class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">8. Export ข้อมูล</a>
+        </div>
+
+        <!-- Content -->
+        <div class="space-y-6 prose-dark">
+
+          <!-- Role badge -->
+          <div class="flex items-center gap-3 card rounded-xl px-5 py-3">
+            <span class="px-3 py-1 rounded-lg badge-admin text-xs font-bold">ADMIN</span>
+            <p class="text-slate-400 text-sm m-0">มีสิทธิ์เข้าถึงทุกฟังก์ชัน — Dashboard, Sync, Alert, System Config</p>
+          </div>
+
+          <!-- 1. Login -->
+          <div id="a-login" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
+              <h2 class="text-lg font-bold text-white m-0">เข้าสู่ระบบ</h2>
+            </div>
+            <div class="space-y-3">
+              <div class="flex gap-3">
+                <div class="w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs text-blue-400 shrink-0 mt-0.5">1</div>
+                <p class="m-0">เปิดเบราว์เซอร์ไปที่ URL ของระบบ</p>
+              </div>
+              <div class="flex gap-3">
+                <div class="w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs text-blue-400 shrink-0 mt-0.5">2</div>
+                <p class="m-0">กดปุ่ม <strong>เข้าสู่ระบบด้วย Google</strong> และเลือกบัญชี <code>@feu.ac.th</code> หรือ <code>@feu.edu</code></p>
+              </div>
+              <div class="flex gap-3">
+                <div class="w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs text-blue-400 shrink-0 mt-0.5">3</div>
+                <p class="m-0">ระบบจะพาไปหน้า <strong>Dashboard</strong> อัตโนมัติ (Admin และ Executive เห็น Dashboard เหมือนกัน แต่ Admin มีปุ่มพิเศษเพิ่ม)</p>
+              </div>
+            </div>
+            <div class="mt-4 card-red rounded-xl px-4 py-3 text-sm">
+              <strong>⚠️ หมายเหตุ:</strong> ระบบรองรับเฉพาะ Email ของ FEU เท่านั้น หากใช้ Email อื่นจะไม่สามารถเข้าได้
+            </div>
+          </div>
+
+          <!-- 2. Overview -->
+          <div id="a-overview" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
+              <h2 class="text-lg font-bold text-white m-0">ภาพรวมโรงเรียน (Overview)</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-1">KPI Cards (4 ตัว)</p>
+                <ul class="m-0 space-y-1">
+                  <li><strong>นักเรียนทั้งหมด</strong> — คลิกดูรายชื่อได้</li>
+                  <li><strong class="text-red-400">เสี่ยงสูง</strong> — score &lt; เกณฑ์ HIGH</li>
+                  <li><strong class="text-amber-400">เสี่ยงปานกลาง</strong> — score ในช่วง MEDIUM</li>
+                  <li><strong class="text-emerald-400">ปกติ</strong> — score ≥ เกณฑ์ LOW</li>
+                </ul>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-1">Charts</p>
+                <ul class="m-0 space-y-1">
+                  <li><strong>Pie chart</strong> — สัดส่วนระดับความเสี่ยง</li>
+                  <li><strong>Trend line</strong> — แนวโน้ม Engagement รายสัปดาห์</li>
+                  <li><strong>Bar chart</strong> — Top 10 วิชา avg score</li>
+                  <li><strong>Gauge</strong> — คะแนนเฉลี่ยภาพรวมโรงเรียน</li>
+                </ul>
+              </div>
+            </div>
+            <p>คลิก KPI card ใดก็ได้เพื่อเปิด <strong>modal รายชื่อนักเรียน</strong> จำแนกตามระดับความเสี่ยง มี search กรองชื่อได้</p>
+            <p>ตาราง <strong>รายวิชาทั้งหมด</strong> สามารถ <strong>ค้นหา / เรียงลำดับ / เปลี่ยนหน้า</strong> ได้ (25 วิชา/หน้า) คลิกหัวตารางเพื่อเรียง</p>
+          </div>
+
+          <!-- 3. Course -->
+          <div id="a-course" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+              <h2 class="text-lg font-bold text-white m-0">รายละเอียดวิชา</h2>
+            </div>
+            <p>คลิกวิชาใดๆ ในตาราง เพื่อดูรายละเอียดภายในวิชา</p>
+            <ul>
+              <li>KPI ของวิชา: จำนวนนักเรียน, เสี่ยงสูง/กลาง/ปกติ, avg score gauge</li>
+              <li>รายชื่อนักเรียนในวิชา พร้อม score, submission rate, risk badge</li>
+              <li>ค้นหาชื่อนักเรียนด้วย search bar</li>
+              <li>คลิกชื่อนักเรียนเพื่อดูรายละเอียดเพิ่มเติม</li>
+            </ul>
+            <p>ใช้ <strong>Breadcrumb</strong> ด้านบนหรือ <strong>ปุ่ม Back</strong> ของเบราว์เซอร์เพื่อย้อนกลับ</p>
+          </div>
+
+          <!-- 4. Student -->
+          <div id="a-student" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
+              <h2 class="text-lg font-bold text-white m-0">รายละเอียดนักเรียน</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">ข้อมูลที่แสดง</p>
+                <ul class="m-0 space-y-1">
+                  <li><strong>Score Breakdown</strong> — ส่งงาน / กิจกรรม / Active Days</li>
+                  <li><strong>Engagement Gauge</strong> — คะแนนรวม</li>
+                  <li><strong>Trend Chart</strong> — แนวโน้มรายสัปดาห์</li>
+                  <li><strong>Per-course scores</strong> — คะแนนแยกตามวิชา</li>
+                  <li><strong>ประวัติการติดตาม</strong> — Interventions ที่บันทึกไว้</li>
+                </ul>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">Recommendation Engine</p>
+                <ul class="m-0 space-y-1">
+                  <li>ระบบวิเคราะห์อัตโนมัติ 6 rules</li>
+                  <li>แสดงเหตุผลและวิธีการ intervention ที่แนะนำ</li>
+                  <li>ระดับ <strong class="text-red-400">Urgent</strong> / <strong class="text-amber-400">Warning</strong> / <strong class="text-emerald-400">Good</strong></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Alert -->
+          <div id="a-alert" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">5</div>
+              <h2 class="text-lg font-bold text-white m-0">ส่ง Alert Email <span class="text-xs font-normal text-purple-400 ml-2">Admin เท่านั้น</span></h2>
+            </div>
+            <div class="flex gap-3 mb-3">
+              <div class="w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs text-blue-400 shrink-0 mt-0.5">1</div>
+              <p class="m-0">กดปุ่ม <strong>📧 ส่ง Alert Email</strong> มุมขวาบน Dashboard</p>
+            </div>
+            <div class="flex gap-3 mb-3">
+              <div class="w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs text-blue-400 shrink-0 mt-0.5">2</div>
+              <p class="m-0">ระบบดึงรายชื่อนักเรียน <strong class="text-red-400">เสี่ยงสูง</strong> อัตโนมัติ เลือก checkbox นักเรียนที่ต้องการแจ้งเตือน (หรือ "เลือกทั้งหมด")</p>
+            </div>
+            <div class="flex gap-3">
+              <div class="w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs text-blue-400 shrink-0 mt-0.5">3</div>
+              <p class="m-0">กด <strong>📧 ส่ง Email</strong> ระบบจะส่ง Email แจ้งเตือนครูผู้สอนทุกวิชาที่นักเรียนลงทะเบียนอยู่</p>
+            </div>
+          </div>
+
+          <!-- 6. Sync -->
+          <div id="a-sync" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">6</div>
+              <h2 class="text-lg font-bold text-white m-0">Sync ข้อมูล Google Classroom <span class="text-xs font-normal text-purple-400 ml-2">Admin เท่านั้น</span></h2>
+            </div>
+            <p>กดปุ่ม <strong>🔄 Sync ข้อมูล</strong> เพื่อดึงข้อมูลล่าสุดจาก Google Classroom มาอัปเดตใน Database</p>
+            <ul>
+              <li>ดึงรายชื่อนักเรียน, ครู, และวิชาทั้งหมด</li>
+              <li>รวม pending invites ที่ยังไม่ได้ accept</li>
+              <li>ใช้เวลาประมาณ 30–60 วินาที ขึ้นกับจำนวนข้อมูล</li>
+            </ul>
+            <div class="mt-3 card-yellow rounded-xl px-4 py-3 text-sm">
+              <strong>⚠️</strong> ควร Sync ก่อนส่ง Alert Email เพื่อให้ข้อมูลเป็นปัจจุบัน
+            </div>
+          </div>
+
+          <!-- 7. Config -->
+          <div id="a-config" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">7</div>
+              <h2 class="text-lg font-bold text-white m-0">ตั้งค่าระบบ <span class="text-xs font-normal text-purple-400 ml-2">Admin เท่านั้น</span></h2>
+            </div>
+            <p>กดปุ่ม <strong>⚙️ ตั้งค่าระบบ</strong> เพื่อปรับค่าต่างๆ</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">ระดับความเสี่ยง</p>
+                <ul class="m-0 space-y-1 text-xs">
+                  <li>กำหนดเกณฑ์ HIGH / MEDIUM / LOW</li>
+                  <li>ค่าเริ่มต้น: HIGH &lt;40, LOW ≥70</li>
+                </ul>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">น้ำหนักคะแนน</p>
+                <ul class="m-0 space-y-1 text-xs">
+                  <li>ส่งงาน 50% + กิจกรรม 30% + Active 20%</li>
+                  <li>ผลรวมต้องเท่ากับ 100%</li>
+                </ul>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">เกณฑ์แจ้งเตือน</p>
+                <ul class="m-0 space-y-1 text-xs">
+                  <li>ปรับ threshold 6 rules</li>
+                  <li>ของ Recommendation Engine</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- 8. Export -->
+          <div id="a-export" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">8</div>
+              <h2 class="text-lg font-bold text-white m-0">Export ข้อมูล</h2>
+            </div>
+            <p>ใน <strong>Course Detail view</strong> จะมีปุ่ม Export 2 รูปแบบ:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+              <div class="card-green rounded-xl p-4">
+                <p class="font-semibold text-emerald-400 mb-1">📊 Excel (.xlsx)</p>
+                <p class="text-xs m-0">ดาวน์โหลดไฟล์ Excel พร้อมรายชื่อ, score, risk level ครบถ้วน เหมาะสำหรับวิเคราะห์ต่อ</p>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="font-semibold text-slate-300 mb-1">🖨️ PDF (Print)</p>
+                <p class="text-xs m-0">เปิดหน้าต่าง print preview พร้อม print ออกกระดาษหรือบันทึกเป็น PDF</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         EXECUTIVE TAB
+    ═══════════════════════════════════════════ -->
+    <div id="content-exec" class="hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6 items-start">
+
+        <div class="sidebar card rounded-xl p-4 space-y-1 text-sm hidden lg:block">
+          <p class="text-xs text-slate-500 uppercase tracking-wider font-bold mb-3">เนื้อหา</p>
+          <a href="#e-login"    class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">1. เข้าสู่ระบบ</a>
+          <a href="#e-overview" class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">2. ภาพรวมโรงเรียน</a>
+          <a href="#e-drill"    class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">3. Drill-Down</a>
+          <a href="#e-export"   class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">4. Export</a>
+          <a href="#e-diff"     class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">5. ต่างจาก Admin</a>
+        </div>
+
+        <div class="space-y-6 prose-dark">
+
+          <div class="flex items-center gap-3 card rounded-xl px-5 py-3">
+            <span class="px-3 py-1 rounded-lg badge-exec text-xs font-bold">EXECUTIVE</span>
+            <p class="text-slate-400 text-sm m-0">สิทธิ์ดูข้อมูลภาพรวม — ไม่มีปุ่ม Sync, Alert, หรือ Config</p>
+          </div>
+
+          <div id="e-login" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
+              <h2 class="text-lg font-bold text-white m-0">เข้าสู่ระบบ</h2>
+            </div>
+            <p>เหมือนกับ Admin — กด <strong>เข้าสู่ระบบด้วย Google</strong> ด้วย Email <code>@feu.ac.th</code> หรือ <code>@feu.edu</code></p>
+            <p>ระบบตรวจ role อัตโนมัติ — Executive จะเข้า Dashboard เหมือน Admin แต่ไม่เห็นปุ่มจัดการ</p>
+          </div>
+
+          <div id="e-overview" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
+              <h2 class="text-lg font-bold text-white m-0">ภาพรวมโรงเรียน</h2>
+            </div>
+            <p>หน้าแรกแสดง KPI ระดับโรงเรียนทั้งหมด:</p>
+            <ul>
+              <li>จำนวนนักเรียนทั้งหมด และจำแนกตาม Risk Level</li>
+              <li>Gauge แสดง Avg Engagement Score ภาพรวม</li>
+              <li>Pie chart สัดส่วนความเสี่ยง และ Trend รายสัปดาห์</li>
+              <li>Top 10 วิชาที่มี Avg Score สูงสุด</li>
+              <li>ตารางวิชาทั้งหมด — ค้นหา / เรียง / เปลี่ยนหน้าได้</li>
+            </ul>
+            <p>กดที่ KPI card เพื่อดูรายชื่อนักเรียนจำแนกตามระดับความเสี่ยง</p>
+          </div>
+
+          <div id="e-drill" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+              <h2 class="text-lg font-bold text-white m-0">Drill-Down วิชา → นักเรียน</h2>
+            </div>
+            <p>คลิกวิชาในตาราง → เห็น KPI + รายชื่อนักเรียนของวิชานั้น</p>
+            <p>คลิกชื่อนักเรียน → เห็น score breakdown, trend, per-course, และ recommendation</p>
+            <p>ใช้ <strong>Breadcrumb</strong> บนสุดหรือ <strong>Back</strong> เบราว์เซอร์เพื่อย้อนกลับ</p>
+          </div>
+
+          <div id="e-export" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
+              <h2 class="text-lg font-bold text-white m-0">Export รายงาน</h2>
+            </div>
+            <p>ใน Course Detail view มีปุ่ม <strong>Export Excel</strong> และ <strong>Export PDF</strong> สำหรับนำข้อมูลไปรายงานต่อผู้บริหารระดับสูง</p>
+          </div>
+
+          <div id="e-diff" class="card rounded-2xl p-6 card-yellow">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">5</div>
+              <h2 class="text-lg font-bold text-white m-0">ข้อแตกต่างจาก Admin</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <p class="text-xs text-amber-400 font-bold mb-2">✅ Executive มีสิทธิ์</p>
+                <ul class="m-0 text-sm">
+                  <li>ดูภาพรวม Dashboard ทั้งหมด</li>
+                  <li>Drill-down วิชา และ นักเรียน</li>
+                  <li>Export Excel / PDF</li>
+                </ul>
+              </div>
+              <div>
+                <p class="text-xs text-red-400 font-bold mb-2">❌ Executive ไม่มีสิทธิ์</p>
+                <ul class="m-0 text-sm">
+                  <li>ส่ง Alert Email</li>
+                  <li>Sync Google Classroom</li>
+                  <li>ตั้งค่าระบบ (Config)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         TEACHER TAB
+    ═══════════════════════════════════════════ -->
+    <div id="content-teacher" class="hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6 items-start">
+
+        <div class="sidebar card rounded-xl p-4 space-y-1 text-sm hidden lg:block">
+          <p class="text-xs text-slate-500 uppercase tracking-wider font-bold mb-3">เนื้อหา</p>
+          <a href="#t-login"    class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">1. เข้าสู่ระบบ</a>
+          <a href="#t-courses"  class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">2. รายวิชา</a>
+          <a href="#t-students" class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">3. รายชื่อนักเรียน</a>
+          <a href="#t-followup" class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">4. บันทึกการติดตาม</a>
+          <a href="#t-export"   class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">5. Export</a>
+          <a href="#t-rec"      class="block text-slate-400 hover:text-blue-400 py-1 transition-colors">6. Recommendation</a>
+        </div>
+
+        <div class="space-y-6 prose-dark">
+
+          <div class="flex items-center gap-3 card rounded-xl px-5 py-3">
+            <span class="px-3 py-1 rounded-lg badge-teacher text-xs font-bold">TEACHER</span>
+            <p class="text-slate-400 text-sm m-0">จัดการนักเรียนในวิชาตนเอง — ดู score, ติดตาม, และ export ได้</p>
+          </div>
+
+          <div id="t-login" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
+              <h2 class="text-lg font-bold text-white m-0">เข้าสู่ระบบ</h2>
+            </div>
+            <p>กด <strong>เข้าสู่ระบบด้วย Google</strong> ด้วย Email <code>@feu.ac.th</code> หรือ <code>@feu.edu</code></p>
+            <p>ระบบจะพาไปหน้า <strong>Teacher Dashboard</strong> อัตโนมัติ แสดงเฉพาะวิชาที่ท่านรับผิดชอบ</p>
+          </div>
+
+          <div id="t-courses" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
+              <h2 class="text-lg font-bold text-white m-0">หน้ารายวิชา</h2>
+            </div>
+            <p>หน้าแรกแสดง <strong>card วิชาทั้งหมด</strong> ที่ท่านรับผิดชอบ แต่ละ card แสดง:</p>
+            <ul>
+              <li>ชื่อวิชาและ Section</li>
+              <li>จำนวนนักเรียนทั้งหมด</li>
+              <li>Avg Engagement Score</li>
+              <li>จำนวนนักเรียนแยกตาม Risk Level</li>
+              <li>สีขอบซ้าย: <span class="text-red-400">แดง = HIGH</span>, <span class="text-amber-400">เหลือง = MEDIUM</span>, <span class="text-emerald-400">เขียว = LOW</span></li>
+            </ul>
+            <p>กดที่ card เพื่อเข้าดูรายชื่อนักเรียนในวิชานั้น</p>
+          </div>
+
+          <div id="t-students" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+              <h2 class="text-lg font-bold text-white m-0">รายชื่อนักเรียน</h2>
+            </div>
+            <p>เมื่อเข้าวิชาแล้วจะเห็น:</p>
+            <ul>
+              <li><strong>KPI cards</strong> — คลิกเพื่อดู modal รายชื่อจำแนกตาม Risk</li>
+              <li><strong>Avg Score Gauge</strong> — คะแนนเฉลี่ยของวิชา</li>
+              <li><strong>รายชื่อนักเรียน</strong> — แสดง score, submission rate, risk badge</li>
+            </ul>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">🔍 ค้นหา / กรอง</p>
+                <ul class="m-0 text-xs space-y-1">
+                  <li>พิมพ์ชื่อในช่องค้นหา</li>
+                  <li>กรองตาม Risk Level ด้วย dropdown</li>
+                </ul>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">📋 Risk Modal</p>
+                <ul class="m-0 text-xs space-y-1">
+                  <li>กด KPI card เพื่อดูรายชื่อ</li>
+                  <li>กด "ติดตาม" ในรายชื่อได้เลย</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div id="t-followup" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
+              <h2 class="text-lg font-bold text-white m-0">บันทึกการติดตามนักเรียน</h2>
+            </div>
+            <p>กดปุ่ม <strong>ติดตาม</strong> ที่การ์ดนักเรียน เพื่อเปิด Intervention Modal</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">วิธีการ</p>
+                <ul class="m-0 text-xs space-y-1">
+                  <li>📞 โทรศัพท์</li>
+                  <li>📧 อีเมล</li>
+                  <li>🏠 เยี่ยมบ้าน</li>
+                  <li>💬 พูดคุย</li>
+                  <li>อื่นๆ</li>
+                </ul>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">บันทึก</p>
+                <ul class="m-0 text-xs space-y-1">
+                  <li>กรอกรายละเอียดในช่อง Note</li>
+                  <li>ระบบแนะนำ Note ให้อัตโนมัติ</li>
+                </ul>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-2">ผลลัพธ์</p>
+                <ul class="m-0 text-xs space-y-1">
+                  <li>⏳ กำลังดำเนินการ</li>
+                  <li>✅ แก้ไขแล้ว</li>
+                  <li>❌ ไม่มีการตอบสนอง</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 card-green rounded-xl px-4 py-3 text-sm">
+              <strong>💡 Tip:</strong> ระบบ Pre-fill วิธีการและ Note ให้อัตโนมัติจาก Recommendation Engine — ท่านสามารถแก้ไขก่อนบันทึกได้
+            </div>
+          </div>
+
+          <div id="t-export" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">5</div>
+              <h2 class="text-lg font-bold text-white m-0">Export รายงาน</h2>
+            </div>
+            <p>ในหน้ารายชื่อนักเรียน มีปุ่ม Export 2 แบบ:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="card-green rounded-xl p-4">
+                <p class="font-semibold text-emerald-400 mb-1">📊 Excel</p>
+                <p class="text-xs m-0">ชื่อ, อีเมล, score, submission rate, risk level ของนักเรียนทุกคนในวิชา</p>
+              </div>
+              <div class="card rounded-xl p-4">
+                <p class="font-semibold text-slate-300 mb-1">🖨️ PDF</p>
+                <p class="text-xs m-0">รายงานสำหรับพิมพ์ส่งฝ่ายวิชาการหรือเก็บเป็น record</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="t-rec" class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="step-num w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">6</div>
+              <h2 class="text-lg font-bold text-white m-0">Recommendation Engine</h2>
+            </div>
+            <p>ระบบวิเคราะห์นักเรียนอัตโนมัติ 6 rules และแนะนำวิธีการ intervention:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+              <div class="flex gap-3 card rounded-xl p-3">
+                <span class="text-red-400 text-sm shrink-0">📵</span>
+                <div>
+                  <p class="text-xs font-semibold text-slate-300 m-0">ส่งงานวิกฤต (&lt;30%)</p>
+                  <p class="text-xs text-slate-500 m-0">→ โทรหาผู้ปกครอง</p>
+                </div>
+              </div>
+              <div class="flex gap-3 card rounded-xl p-3">
+                <span class="text-amber-400 text-sm shrink-0">📋</span>
+                <div>
+                  <p class="text-xs font-semibold text-slate-300 m-0">ส่งงานต่ำ (30–60%)</p>
+                  <p class="text-xs text-slate-500 m-0">→ พูดคุยส่วนตัว</p>
+                </div>
+              </div>
+              <div class="flex gap-3 card rounded-xl p-3">
+                <span class="text-red-400 text-sm shrink-0">🏫</span>
+                <div>
+                  <p class="text-xs font-semibold text-slate-300 m-0">Active days วิกฤต (&lt;3 วัน)</p>
+                  <p class="text-xs text-slate-500 m-0">→ เยี่ยมบ้าน</p>
+                </div>
+              </div>
+              <div class="flex gap-3 card rounded-xl p-3">
+                <span class="text-amber-400 text-sm shrink-0">📅</span>
+                <div>
+                  <p class="text-xs font-semibold text-slate-300 m-0">Active days ต่ำ (3–8 วัน)</p>
+                  <p class="text-xs text-slate-500 m-0">→ พูดคุยส่วนตัว</p>
+                </div>
+              </div>
+              <div class="flex gap-3 card rounded-xl p-3">
+                <span class="text-amber-400 text-sm shrink-0">📉</span>
+                <div>
+                  <p class="text-xs font-semibold text-slate-300 m-0">Score ลด 3 สัปดาห์ติด</p>
+                  <p class="text-xs text-slate-500 m-0">→ ส่ง Email แจ้งผู้ปกครอง</p>
+                </div>
+              </div>
+              <div class="flex gap-3 card rounded-xl p-3">
+                <span class="text-amber-400 text-sm shrink-0">💤</span>
+                <div>
+                  <p class="text-xs font-semibold text-slate-300 m-0">Activity score ต่ำ (&lt;20%)</p>
+                  <p class="text-xs text-slate-500 m-0">→ พูดคุยส่วนตัว</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-12 text-center border-t border-slate-800 pt-8">
+      <p class="text-slate-600 text-xs">Student Engagement Intelligence System — Far Eastern University</p>
+      <p class="text-slate-700 text-xs mt-1">หากพบปัญหาการใช้งาน กรุณาติดต่อผู้ดูแลระบบ</p>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(role) {
+      ['admin','exec','teacher'].forEach(r => {
+        document.getElementById(`content-${r}`).classList.add('hidden');
+        const tab = document.getElementById(`tab-${r}`);
+        tab.className = tab.className.replace('tab-active','tab-inactive');
+      });
+      document.getElementById(`content-${role}`).classList.remove('hidden');
+      const activeTab = document.getElementById(`tab-${role}`);
+      activeTab.className = activeTab.className.replace('tab-inactive','tab-active');
+    }
+  </script>
+</body>
+</html>
