@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ประวัติการติดตาม — Student Engagement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 40%, #0369a1 70%, #0e7490 100%); }
+    .card        { background: rgba(15,23,42,0.75); border: 1px solid rgba(51,65,85,0.55); }
+    .glow-input  { background:rgba(15,23,42,0.7); border:1px solid rgba(71,85,105,0.5); color:#e2e8f0; }
+    .glow-input::placeholder { color:#475569; }
+    .glow-input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 2px rgba(59,130,246,0.2); }
+    select.glow-input option { background:#1e293b; color:#e2e8f0; }
+    .row-hover:hover { background: rgba(30,41,59,0.6); }
+  </style>
+</head>
+<body class="bg-[#080f1e] font-sarabun min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="gradient-bg px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-lg shadow-black/30">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+        <span class="text-white text-sm">🍎</span>
+      </div>
+      <span class="font-bold text-white hidden sm:block tracking-wide">Teacher Dashboard</span>
+      <span class="text-white/30 hidden sm:inline">|</span>
+      <span id="teacherName" class="text-sm text-blue-200 hidden sm:inline"></span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="teacher.html" class="text-sm text-blue-300 hover:text-blue-200 transition-colors">← รายวิชา</a>
+      <a href="guide.html" target="_blank" class="text-sm text-blue-300 hover:text-blue-200 transition-colors hidden sm:inline">คู่มือ</a>
+      <button onclick="AUTH.logout()" class="text-sm text-red-300 hover:text-red-200 transition-colors">ออกจากระบบ</button>
+    </div>
+  </nav>
+
+  <div class="max-w-5xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-white">📋 ประวัติการติดตามนักเรียน</h1>
+        <p id="headerSub" class="text-sm text-slate-500 mt-1">กำลังโหลด...</p>
+      </div>
+      <button onclick="HISTORY.exportExcel()"
+        class="flex items-center gap-2 bg-emerald-700/80 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+        📊 Export Excel
+      </button>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div class="card rounded-xl p-4 text-center">
+        <p class="text-xs text-slate-500 mb-1">ทั้งหมด</p>
+        <p id="statTotal" class="text-2xl font-bold text-white">—</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center" style="border-color:rgba(16,185,129,0.3);background:rgba(20,83,45,0.25)">
+        <p class="text-xs text-emerald-400 mb-1">✅ แก้ไขแล้ว</p>
+        <p id="statResolved" class="text-2xl font-bold text-emerald-400">—</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center" style="border-color:rgba(180,83,9,0.3);background:rgba(120,53,15,0.25)">
+        <p class="text-xs text-amber-400 mb-1">⏳ กำลังดำเนินการ</p>
+        <p id="statInProgress" class="text-2xl font-bold text-amber-400">—</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center" style="border-color:rgba(185,28,28,0.3);background:rgba(127,29,29,0.25)">
+        <p class="text-xs text-red-400 mb-1">❌ ไม่มีการตอบสนอง</p>
+        <p id="statNoResponse" class="text-2xl font-bold text-red-400">—</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card rounded-xl px-5 py-4 mb-5 flex flex-wrap gap-3 items-end">
+      <div class="flex-1 min-w-[160px]">
+        <label class="text-xs text-slate-500 block mb-1">วิชา</label>
+        <select id="filterCourse" onchange="HISTORY.applyFilter()"
+          class="glow-input w-full rounded-lg px-3 py-2 text-sm">
+          <option value="">ทุกวิชา</option>
+        </select>
+      </div>
+      <div class="flex-1 min-w-[140px]">
+        <label class="text-xs text-slate-500 block mb-1">วิธีการ</label>
+        <select id="filterMethod" onchange="HISTORY.applyFilter()"
+          class="glow-input w-full rounded-lg px-3 py-2 text-sm">
+          <option value="">ทุกวิธี</option>
+          <option value="call">📞 โทรศัพท์</option>
+          <option value="email">📧 อีเมล</option>
+          <option value="visit">🏠 เยี่ยมบ้าน</option>
+          <option value="meeting">💬 พูดคุย</option>
+          <option value="other">อื่นๆ</option>
+        </select>
+      </div>
+      <div class="flex-1 min-w-[140px]">
+        <label class="text-xs text-slate-500 block mb-1">ผลลัพธ์</label>
+        <select id="filterOutcome" onchange="HISTORY.applyFilter()"
+          class="glow-input w-full rounded-lg px-3 py-2 text-sm">
+          <option value="">ทุกผลลัพธ์</option>
+          <option value="in_progress">⏳ กำลังดำเนินการ</option>
+          <option value="resolved">✅ แก้ไขแล้ว</option>
+          <option value="no_response">❌ ไม่มีการตอบสนอง</option>
+        </select>
+      </div>
+      <div class="flex-1 min-w-[160px]">
+        <label class="text-xs text-slate-500 block mb-1">ค้นหานักเรียน</label>
+        <input id="filterSearch" type="text" placeholder="🔍 พิมพ์ชื่อ..."
+          oninput="HISTORY.applyFilter()"
+          class="glow-input w-full rounded-lg px-3 py-2 text-sm">
+      </div>
+      <button onclick="HISTORY.resetFilter()"
+        class="text-xs text-slate-500 hover:text-slate-300 px-3 py-2 rounded-lg border border-slate-700/50 hover:bg-slate-800 transition-colors whitespace-nowrap">
+        รีเซ็ต
+      </button>
+    </div>
+
+    <!-- Result count -->
+    <p id="resultCount" class="text-xs text-slate-500 mb-3 px-1"></p>
+
+    <!-- List -->
+    <div id="historyList" class="space-y-3">
+      <div class="card rounded-xl p-10 text-center text-slate-500">กำลังโหลด...</div>
+    </div>
+
+    <!-- Empty -->
+    <div id="historyEmpty" class="hidden card rounded-xl p-12 text-center">
+      <p class="text-4xl mb-3">📭</p>
+      <p class="text-slate-400 font-medium">ไม่พบประวัติการติดตาม</p>
+      <p class="text-slate-600 text-sm mt-1">ลองเปลี่ยนตัวกรองหรือค้นหาใหม่</p>
+    </div>
+
+    <!-- Error -->
+    <div id="historyError" class="hidden"></div>
+
+  </div>
+
+  <script>
+    const _v = Date.now();
+    ['config','utils','auth','api.v2','history'].reduce((p, name) => {
+      return p.then(() => new Promise((res, rej) => {
+        const s  = document.createElement('script');
+        s.src    = `assets/js/${name}.js?v=${_v}`;
+        s.onload = res;
+        s.onerror = rej;
+        document.head.appendChild(s);
+      }));
+    }, Promise.resolve()).then(() => HISTORY.init());
+  </script>
+</body>
+</html>
