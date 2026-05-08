@@ -448,35 +448,44 @@
             <span id="cfg_weightSum" class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">รวม 100%</span>
           </div>
           <div class="card rounded-xl p-4 space-y-4">
-            <div class="grid grid-cols-[1fr_auto_auto] items-center gap-3">
+            <div class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3">
               <div>
                 <p class="text-sm text-slate-300 font-medium">อัตราส่งงาน (Submission Rate)</p>
                 <p class="text-xs text-slate-600">ส่วนน้ำหนักในสูตร engagementScore</p>
               </div>
               <input id="cfg_wSubmission" type="range" min="0" max="100"
-                oninput="DASHBOARD._onWeightChange()"
+                oninput="DASHBOARD._onWeightChange('slider','wSubmission')"
                 class="w-24 accent-blue-500">
-              <span id="cfg_wSubmission_val" class="text-sm font-bold text-blue-400 w-10 text-right">50%</span>
+              <input id="cfg_wSubmission_txt" type="number" min="0" max="100"
+                oninput="DASHBOARD._onWeightChange('text','wSubmission')"
+                class="glow-input w-14 rounded-lg px-2 py-1 text-sm text-center font-bold">
+              <span class="text-slate-500 text-sm">%</span>
             </div>
-            <div class="grid grid-cols-[1fr_auto_auto] items-center gap-3">
+            <div class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3">
               <div>
                 <p class="text-sm text-slate-300 font-medium">คะแนนกิจกรรม (Activity Score)</p>
                 <p class="text-xs text-slate-600">ส่วนน้ำหนักในสูตร engagementScore</p>
               </div>
               <input id="cfg_wActivity" type="range" min="0" max="100"
-                oninput="DASHBOARD._onWeightChange()"
+                oninput="DASHBOARD._onWeightChange('slider','wActivity')"
                 class="w-24 accent-blue-500">
-              <span id="cfg_wActivity_val" class="text-sm font-bold text-blue-400 w-10 text-right">30%</span>
+              <input id="cfg_wActivity_txt" type="number" min="0" max="100"
+                oninput="DASHBOARD._onWeightChange('text','wActivity')"
+                class="glow-input w-14 rounded-lg px-2 py-1 text-sm text-center font-bold">
+              <span class="text-slate-500 text-sm">%</span>
             </div>
-            <div class="grid grid-cols-[1fr_auto_auto] items-center gap-3">
+            <div class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3">
               <div>
                 <p class="text-sm text-slate-300 font-medium">วันที่ active (Active Days)</p>
                 <p class="text-xs text-slate-600">ส่วนน้ำหนักในสูตร engagementScore</p>
               </div>
               <input id="cfg_wActiveDays" type="range" min="0" max="100"
-                oninput="DASHBOARD._onWeightChange()"
+                oninput="DASHBOARD._onWeightChange('slider','wActiveDays')"
                 class="w-24 accent-blue-500">
-              <span id="cfg_wActiveDays_val" class="text-sm font-bold text-blue-400 w-10 text-right">20%</span>
+              <input id="cfg_wActiveDays_txt" type="number" min="0" max="100"
+                oninput="DASHBOARD._onWeightChange('text','wActiveDays')"
+                class="glow-input w-14 rounded-lg px-2 py-1 text-sm text-center font-bold">
+              <span class="text-slate-500 text-sm">%</span>
             </div>
             <p class="text-xs text-slate-600 border-t border-slate-700/50 pt-3">
               สูตร: <code class="text-slate-400">engagementScore = (submissionRate × W1%) + (activityScore × W2%) + (activeDays/30×100 × W3%)</code>

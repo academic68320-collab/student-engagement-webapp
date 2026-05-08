@@ -36,6 +36,20 @@ const UTILS = {
     setTimeout(() => { this._loaderEl?.remove(); this._loaderEl = null; }, 400);
   },
 
+  setAvatar(imgEl, url, name) {
+    if (!imgEl) return;
+    const initial = (name || '?').trim().charAt(0).toUpperCase();
+    const fallbackSvg = `data:image/svg+xml,${encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+        <rect width="32" height="32" rx="16" fill="#1d4ed8"/>
+        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="600"
+          font-family="Sarabun,sans-serif" fill="white">${initial}</text>
+      </svg>`
+    )}`;
+    imgEl.onerror = () => { imgEl.src = fallbackSvg; imgEl.onerror = null; };
+    imgEl.src = url || fallbackSvg;
+  },
+
   escapeHtml(str) {
     if (str === null || str === undefined) return '—';
     return String(str)

@@ -14,8 +14,8 @@ const DASHBOARD = {
 
     UTILS.showLoader('กำลังโหลดข้อมูล Dashboard...');
 
-    document.getElementById('userName').textContent    = UTILS.escapeHtml(user.name);
-    document.getElementById('userAvatar').src          = user.picture;
+    document.getElementById('userName').textContent = UTILS.escapeHtml(user.name);
+    UTILS.setAvatar(document.getElementById('userAvatar'), user.picture, user.name);
     document.getElementById('lastUpdated').textContent =
       `อัปเดตล่าสุด: ${new Date().toLocaleString('th-TH')}`;
 
@@ -734,9 +734,12 @@ const DASHBOARD = {
     document.getElementById('cfg_lowDisplay').textContent = cfg.mediumMax + '+';
 
     // Weights
-    document.getElementById('cfg_wSubmission').value  = cfg.wSubmission;
-    document.getElementById('cfg_wActivity').value    = cfg.wActivity;
-    document.getElementById('cfg_wActiveDays').value  = cfg.wActiveDays;
+    document.getElementById('cfg_wSubmission').value      = cfg.wSubmission;
+    document.getElementById('cfg_wSubmission_txt').value  = cfg.wSubmission;
+    document.getElementById('cfg_wActivity').value        = cfg.wActivity;
+    document.getElementById('cfg_wActivity_txt').value    = cfg.wActivity;
+    document.getElementById('cfg_wActiveDays').value      = cfg.wActiveDays;
+    document.getElementById('cfg_wActiveDays_txt').value  = cfg.wActiveDays;
     this._onWeightChange();
 
     // Recommendation thresholds
@@ -754,15 +757,18 @@ const DASHBOARD = {
     document.getElementById('configModal').classList.add('hidden');
   },
 
-  _onWeightChange() {
-    const w1 = Number(document.getElementById('cfg_wSubmission').value);
-    const w2 = Number(document.getElementById('cfg_wActivity').value);
-    const w3 = Number(document.getElementById('cfg_wActiveDays').value);
-    const sum = w1 + w2 + w3;
+  _onWeightChange(source, field) {
+    if (source && field) {
+      const slider = document.getElementById(`cfg_${field}`);
+      const txt    = document.getElementById(`cfg_${field}_txt`);
+      if (source === 'slider') txt.value   = slider.value;
+      else                     slider.value = txt.value;
+    }
 
-    document.getElementById('cfg_wSubmission_val').textContent = w1 + '%';
-    document.getElementById('cfg_wActivity_val').textContent   = w2 + '%';
-    document.getElementById('cfg_wActiveDays_val').textContent = w3 + '%';
+    const w1  = Number(document.getElementById('cfg_wSubmission').value);
+    const w2  = Number(document.getElementById('cfg_wActivity').value);
+    const w3  = Number(document.getElementById('cfg_wActiveDays').value);
+    const sum = w1 + w2 + w3;
 
     const sumEl = document.getElementById('cfg_weightSum');
     sumEl.textContent = `รวม ${sum}%`;
@@ -770,11 +776,8 @@ const DASHBOARD = {
       ? 'text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-950/50 text-emerald-400 border border-emerald-800/40'
       : 'text-xs font-bold px-2 py-0.5 rounded-full bg-red-950/50 text-red-400 border border-red-800/40';
 
-    // Auto-update LOW display
     const mediumMax = Number(document.getElementById('cfg_mediumMax').value);
-    if (!isNaN(mediumMax)) {
-      document.getElementById('cfg_lowDisplay').textContent = mediumMax + '+';
-    }
+    if (!isNaN(mediumMax)) document.getElementById('cfg_lowDisplay').textContent = mediumMax + '+';
   },
 
   saveConfig() {
