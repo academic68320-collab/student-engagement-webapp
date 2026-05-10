@@ -32,39 +32,45 @@
 
 ```
 D:\GCE\
-├── index.html          — Login page (Google OAuth + dev bypass)
+├── index.html          — Login page (Google OAuth + dev bypass + link คู่มือ)
 ├── dashboard.html      — Admin/Executive dashboard
 ├── teacher.html        — Teacher page
+├── guide.html          — คู่มือการใช้งาน (แยก 3 role: Admin / Executive / Teacher)
+├── history.html        — ประวัติการติดตาม (teacher เท่านั้น)
 ├── ONBOARDING.md       — ไฟล์นี้
+├── InterventionHistory.gs — Apps Script snippet (user copy ไปใส่ GAS)
 ├── assets/
 │   ├── css/style.css   — Global styles (loader, toast, score-bar)
 │   └── js/
 │       ├── utils.js    — UTILS: escapeHtml, toast, showLoader/hideLoader,
-│       │                  formatDate, riskBadge, recommend()
+│       │                  formatDate, riskBadge, recommend(), setAvatar(), apiError()
 │       ├── auth.js     — AUTH: Google OAuth, session, requireAuth, logout
 │       ├── api.v2.js   — API: get(action, params), post(action, body)
+│       ├── config.js   — CONFIG: threshold + weight factors (localStorage)
 │       ├── charts.js   — CHARTS: renderPie, renderTrend, renderGauge, renderBar
-│       ├── dashboard.js — DASHBOARD object (ดูด้านล่าง)
-│       └── teacher.js  — TEACHER object (ดูด้านล่าง)
+│       ├── dashboard.js — DASHBOARD object
+│       ├── teacher.js  — TEACHER object
+│       └── history.js  — HISTORY object (ประวัติ intervention)
 ```
 
 **Google Apps Script files** (ผู้ใช้จัดการเอง — ไม่อยู่ใน repo):
 ```
-WebApp.gs       — doGet / doPost router
-DataSync.gs     — syncCoursesAndStudents, syncTeachers
-Notification.gs — sendRiskAlertEmails, _buildAlertEmail
-DB.gs           — DB.getAll, DB.findMany, DB.upsert (helper)
+WebApp.gs              — doGet / doPost router
+DataSync.gs            — syncCoursesAndStudents, syncTeachers
+Notification.gs        — sendRiskAlertEmails, _buildAlertEmail
+DB.gs                  — DB.getAll, DB.findMany, DB.upsert (helper)
+InterventionHistory.gs — getTeacherInterventions (เพิ่ม session 2026-05-08)
 ```
 
 ---
 
 ## 🔌 API
 
-**URL ปัจจุบัน:**
+**URL ปัจจุบัน (2026-05-08):**
 ```
-https://script.google.com/macros/s/AKfycbyA9OZ4ru14QXRGSrKsnBzQw_0X7VsjbxzA89Ux0E2IARGRwqID3f1mKMR6fXnH_ELv/exec
+https://script.google.com/macros/s/AKfycbxuM1UQx6AWcHm2WG2VSR-RT7jnhNHWS-AfYnkPy6mVg7teuX4ZFGGua-BMhBdxzOxO/exec
 ```
-> ⚠️ ทุกครั้งที่ deploy Apps Script ใหม่ URL จะเปลี่ยน → ต้องอัพเดตใน `api.v2.js`
+> ⚠️ ทุกครั้งที่ deploy Apps Script ใหม่ URL จะเปลี่ยน → ต้องอัพเดตบรรทัดแรกใน `api.v2.js`
 
 **API Actions (GET):**
 | action | params | ใช้ที่ไหน |
@@ -77,6 +83,7 @@ https://script.google.com/macros/s/AKfycbyA9OZ4ru14QXRGSrKsnBzQw_0X7VsjbxzA89Ux0
 | `getTeacherCourses` | `teacherEmail` | course list (teacher page) |
 | `getScores` | `riskLevel?` | risk modal (dashboard) |
 | `getAlertPreview` | — | preview นักเรียน HIGH risk ก่อนส่ง email |
+| `getTeacherInterventions` | `teacherEmail` | ประวัติ intervention (history page) |
 
 **API Actions (POST):**
 | action | body | ใช้ที่ไหน |
@@ -84,6 +91,14 @@ https://script.google.com/macros/s/AKfycbyA9OZ4ru14QXRGSrKsnBzQw_0X7VsjbxzA89Ux0
 | `logIntervention` | `{studentId, teacherId, method, note, outcome}` | บันทึกการติดตาม |
 | `sendAlerts` | `{studentIds: []}` | ส่ง email แจ้งเตือนครู |
 | `manualSync` | — | sync Google Classroom |
+
+**Apps Script pattern (WebApp.gs):**
+```javascript
+// ใช้ _json() ไม่ใช่ ok()
+case 'getTeacherInterventions':
+  _requireRole(email, ['teacher', 'admin']);
+  return _json({ success: true, data: getTeacherInterventions(e.parameter.teacherEmail) });
+```
 
 ---
 
@@ -104,69 +119,99 @@ https://script.google.com/macros/s/AKfycbyA9OZ4ru14QXRGSrKsnBzQw_0X7VsjbxzA89Ux0
 ## 📐 Engagement Score Formula
 
 ```
-engagementScore = (submissionRate × 0.5) + (activityScore × 0.3) + (activeDays/30 × 100 × 0.2)
+engagementScore = (submissionRate × wSubmission) + (activityScore × wActivity) + (activeDays/30 × 100 × wActiveDays)
+
+Default weights (config.js):
+  wSubmission  = 50%
+  wActivity    = 30%
+  wActiveDays  = 20%
 
 riskLevel:
-  HIGH   = score < 40
-  MEDIUM = score 40–69
-  LOW    = score ≥ 70
+  HIGH   = score < highMax   (default 40)
+  MEDIUM = score < mediumMax (default 70)
+  LOW    = score ≥ mediumMax
 ```
+> Threshold + Weight ปรับได้จาก System Config UI (admin only) → บันทึกใน localStorage
 
 ---
 
 ## ✅ Features ที่ทำเสร็จแล้ว
 
+### Login (`index.html`)
+- [x] Google OAuth GSI — programmatic init + renderButton
+- [x] Dev bypass (localhost only) — email + role dropdown
+- [x] Hero landing (desktop): slideshow 5 features, stats row, particles
+- [x] Dark gradient theme
+- [x] Link ไปคู่มือการใช้งาน
+
 ### Dashboard (`dashboard.html` + `dashboard.js`)
 - [x] Overview KPI cards (คลิกดูรายชื่อนักเรียน → modal)
 - [x] Risk pie chart + Trend line chart
-- [x] Top 10 วิชา bar chart (tooltip แสดงชื่อเต็ม)
-- [x] Avg Engagement Gauge (school-wide weighted average)
-- [x] Course table: search, sort (clickable headers), pagination (25/page)
+- [x] Top 10 วิชา bar chart
+- [x] Avg Engagement Gauge (school-wide)
+- [x] Course table: search, sort, pagination (25/page)
 - [x] Course detail: KPI + student table + avg score gauge
 - [x] Student detail: score breakdown, gauge, trend chart, per-course scores, intervention history
-- [x] Recommendation Engine card (วิเคราะห์อัตโนมัติ)
-- [x] Risk modal (click KPI → รายชื่อนักเรียน พร้อม search)
+- [x] Recommendation Engine card (rule-based)
+- [x] Risk modal (click KPI → รายชื่อนักเรียน)
 - [x] Alert email modal (checkbox select → POST sendAlerts)
-- [x] Export Excel (SheetJS) + PDF (print window)
-- [x] Admin buttons: Sync + Send Alert (แสดงเฉพาะ role admin)
-- [x] **Dark theme** (match login page — navy gradient + dark cards)
-- [x] **Responsive**: table → card list บน mobile
+- [x] Export Excel + PDF
+- [x] Admin buttons: Sync + Send Alert (admin only)
+- [x] **⚙️ System Config UI** (admin only) — ตั้ง threshold + weight factors พร้อม slider+textbox
+- [x] **Dark theme** — navy gradient + dark cards
+- [x] **Browser back button** — History API pushState/popstate
+- [x] **API error state** — retry button ถ้า API ไม่ตอบ
+- [x] **Avatar fallback** — SVG initials เมื่อโหลดรูปไม่ได้
+- [x] **Transparent loader** — blur backdrop overlay
+- [x] **riskBadge CSS dot** — แทน emoji (projector safe)
+- [x] Link ไปคู่มือ
 
 ### Teacher Page (`teacher.html` + `teacher.js`)
 - [x] Course list (click เข้า student list)
 - [x] Student list: search, risk filter, export Excel/PDF
-- [x] KPI cards (คลิกดูรายชื่อ → modal)
+- [x] KPI cards + risk modal
 - [x] Avg Score Gauge ต่อวิชา
-- [x] Risk modal (ไม่ต้อง API call — ใช้ `_allStudents` ที่โหลดแล้ว)
 - [x] Intervention modal: method, note, outcome
-- [x] **Recommendation pre-fill**: ระบบเลือก method + เติม note ให้อัตโนมัติ
-- [x] **Dark theme** (match dashboard)
-- [x] **Responsive**: card layout พร้อม touch-friendly
+- [x] **Recommendation pre-fill**
+- [x] **Dark theme**
+- [x] **Browser back button** — History API
+- [x] **API error state** — retry button
+- [x] Link ไปประวัติติดตาม + คู่มือ
+
+### คู่มือ (`guide.html`)
+- [x] Tab switching: Admin / Executive / Teacher
+- [x] Admin: 8 sections (Overview, Course, Student, System Config, Export, Alert, Sync, FAQ)
+- [x] Executive: 5 sections
+- [x] Teacher: 6 sections (Course, Student, Intervention, History, Export, FAQ)
+- [x] Dark theme + sticky sidebar (desktop)
+
+### ประวัติการติดตาม (`history.html` + `history.js`)
+- [x] Stats row (total, this month, pending, resolved)
+- [x] Filter bar: วิชา + method + ช่วงเวลา
+- [x] History card list (timeline)
+- [x] Export Excel
+- [x] เรียงล่าสุดก่อน
+- [x] เรียก API `getTeacherInterventions`
 
 ### Google Apps Script
-- [x] Classroom Sync รวม **pending invites** (ครู + นักเรียนที่ยังไม่ accept)
+- [x] Classroom Sync รวม pending invites
 - [x] Teacher email lookup: CourseTeachers → Courses.ownerId fallback
-- [x] Email HTML template (ไม่ใช้ emoji — ใช้ styled HTML แทน)
-- [x] `_getAlertPreview()` join ผ่าน Students sheet (ไม่ใช่ Users)
-
-### Shared
-- [x] `UTILS.recommend(student)` — rule-based engine, 5 rules
-- [x] `UTILS.showLoader / hideLoader` — full-page gradient overlay
-- [x] Chart.js dark theme (axis สี slate, gauge track สีเข้ม)
+- [x] Email HTML template
+- [x] `getTeacherInterventions` — join Interventions + Students + Courses + Enrollments
 
 ---
 
 ## 💡 Recommendation Engine Rules
 
 ```javascript
-// ใน UTILS.recommend(student) — utils.js
-Rule 1: submissionRate < 30%    → urgent  → method: 'call'    (โทรหาผู้ปกครอง)
-Rule 2: submissionRate 30–60%   → warning → method: 'meeting' (พูดคุย)
-Rule 3: activeDays < 3          → urgent  → method: 'visit'   (เยี่ยมบ้าน)
-Rule 4: activeDays < 8          → warning → method: 'meeting'
-Rule 5: score ลด 3 สัปดาห์ ≥10  → warning → method: 'email'
-Rule 6: activityScore < 20%     → warning → method: 'meeting'
+Rule 1: submissionRate < subUrgent%   → urgent  → method: 'call'    (โทรหาผู้ปกครอง)
+Rule 2: submissionRate < subWarning%  → warning → method: 'meeting'
+Rule 3: activeDays < daysUrgent       → urgent  → method: 'visit'   (เยี่ยมบ้าน)
+Rule 4: activeDays < daysWarning      → warning → method: 'meeting'
+Rule 5: score ลด 3 สัปดาห์ ≥ trendDrop → warning → method: 'email'
+Rule 6: activityScore < actWarning%   → warning → method: 'meeting'
 ```
+> ค่า default ปรับได้จาก System Config — บันทึกใน localStorage ผ่าน `config.js`
 
 ---
 
@@ -183,25 +228,8 @@ Card GREEN:   rgba(20,83,45,0.25)  border rgba(22,101,52,0.3)
 Modal bg:     #0f172a
 Text primary: text-slate-200
 Text muted:   text-slate-400 / text-slate-500
-Input:        .glow-input class (dark bg + blue focus ring)
+Loader:       backdrop-filter blur + semi-transparent overlay + card
 ```
-
-**CSS Classes (style.css + inline `<style>`):**
-- `.gradient-bg` — navbar/button gradient
-- `.card` — dark card base
-- `.card-red/yellow/green` — tinted risk cards
-- `.glow-input` — dark input/select
-- `.tbl-row:hover` — dark table row hover
-- `.tbl-head th` — dark table header
-
----
-
-## 📋 Pending Tasks
-
-| Priority | Feature | รายละเอียด |
-|---|---|---|
-| Medium | ⚙️ System Config UI | หน้า admin ตั้ง threshold HIGH/MEDIUM/LOW + weight factors |
-| Low | 🚀 Deploy | Push ไฟล์ล่าสุดขึ้น Netlify |
 
 ---
 
@@ -209,8 +237,9 @@ Input:        .glow-input class (dark bg + blue focus ring)
 
 1. **API URL เปลี่ยนทุก deploy** — อัพเดตใน `D:\GCE\assets\js\api.v2.js` บรรทัดแรก
 2. **CourseId type mismatch** — Apps Script เก็บเป็น Number, Classroom API return String → ใช้ `String(courseId)` เสมอ
-3. **Pending invites** — ครู/นักเรียนที่ยังไม่ accept invite จะไม่ปรากฏใน Classroom API `Members.list()` → ต้องใช้ `Invitations.list()` ด้วย
+3. **Pending invites** — ครู/นักเรียนที่ยังไม่ accept invite → ต้องใช้ `Invitations.list()` ด้วย
 4. **Email emoji** — Gmail ไม่ render emoji ใน HTML email → ใช้ styled `<span>` แทน
+5. **history.html** — ยังไม่ได้ verify end-to-end หลัง fix `ok()` → `_json()` ใน WebApp.gs
 
 ---
 
@@ -224,4 +253,4 @@ Role:  admin / executive / teacher
 
 ---
 
-*Last updated: 2026-05-07*
+*Last updated: 2026-05-11*
